@@ -28,7 +28,10 @@ jobs:
         run: |
           flake8 . --max-line-length=120
 
-      - name: Build Docker image
-        if: ${{ exists('Dockerfile') }}
+      - name: Build Docker image (if Dockerfile exists)
         run: |
-          docker build -t test-image:latest .
+          if [ -f Dockerfile ]; then
+            docker build -t test-image:latest .
+          else
+            echo "No Dockerfile found, skipping docker build."
+          fi
