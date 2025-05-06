@@ -52,9 +52,3 @@ variable db_password {
   default     = "admin"
   description = "Database password"
 }
-
-variable db_schema {
-  type        = string
-  default     = "chatbot"
-  description = "Database schema"
-}
