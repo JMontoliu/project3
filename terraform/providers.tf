@@ -8,5 +8,6 @@ terraform {
 }
 
 provider "google" {
-  # Configuration options
+  project = "DataIAProject3"
+  region  = var.region
 }
