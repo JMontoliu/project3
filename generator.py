@@ -13,6 +13,7 @@ fake = Faker("es_ES")
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
+
 def generar_reserva():
     return {
         "id_persona": str(uuid.uuid4()),
