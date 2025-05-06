@@ -29,5 +29,6 @@ jobs:
           flake8 . --max-line-length=120
 
       - name: Build Docker image
+        if: ${{ exists('Dockerfile') }}
         run: |
           docker build -t test-image:latest .
