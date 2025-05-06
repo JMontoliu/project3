@@ -15,3 +15,10 @@ module "bbdd" {
   db_password = var.db_password
   db_schema = var.db_schema
 }
+
+module "cf" {
+  source        = "./modules/cf"
+  project_id    = var.project_id
+  location      = "europe-west1"
+  function_name = "pubsub_listener"
+}
