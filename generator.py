@@ -24,6 +24,7 @@ def generar_reserva():
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
+
 for _ in range(10):
     reserva = generar_reserva()
     data_json = json.dumps(reserva).encode("utf-8")
