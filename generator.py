@@ -5,14 +5,11 @@ import json
 from faker import Faker
 from datetime import datetime
 from google.cloud import pubsub_v1
-
 PROJECT_ID = "dataproject03"
 TOPIC_ID = "pruebatopic"
-
 fake = Faker("es_ES")
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
-
 def generar_reserva():
     return {
         "id_persona": str(uuid.uuid4()),
@@ -23,7 +20,6 @@ def generar_reserva():
         "status": random.choice(["pendiente", "confirmada", "cancelada", "realizada"]),
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-
 for _ in range(10):
     reserva = generar_reserva()
     data_json = json.dumps(reserva).encode("utf-8")
