@@ -3,6 +3,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 
+
 def create_chain():
     prompt_template = PromptTemplate(
         input_variables=["history", "new_input"],
