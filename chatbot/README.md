@@ -22,7 +22,7 @@ ConversationBufferMemory: Guarda historial de conversación.
 ```mermaid
 graph TD
     User[Usuario] -->|Mensaje| Bot[Bot de Telegram]
-    Bot -->|Texto| LLM[Cadena LLM (Gemini + memoria)]
+    Bot -->|Texto| LLM[Cadena LLM - Gemini + memoria]
     LLM -->|Respuesta| Bot
     Bot -->|Texto| User
 ```
