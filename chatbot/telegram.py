@@ -24,7 +24,7 @@ def run_bot():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    print("Bot iniciado...")
+    print("Bot started...")
     application.run_polling()
 
 
