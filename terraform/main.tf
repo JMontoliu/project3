@@ -14,3 +14,11 @@ module "bbdd" {
   db_user = var.db_user
   db_password = var.db_password
 }
+
+module "pubsub" {
+  source = "./modules/pubsub"
+  topic_name = var.topic_name
+  subscription_name = var.subscription_name
+  subscription_labels = var.subscription_labels
+  push_endpoint = var.push_endpoint
+}

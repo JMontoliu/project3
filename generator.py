@@ -7,7 +7,7 @@ from datetime import datetime
 from google.cloud import pubsub_v1
 
 PROJECT_ID = "dataproject03"
-TOPIC_ID = "pruebatopic"
+TOPIC_ID = "chatbot-topic"
 
 fake = Faker("es_ES")
 publisher = pubsub_v1.PublisherClient()
