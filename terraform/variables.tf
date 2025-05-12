@@ -76,3 +76,33 @@ variable "push_endpoint" {
   default     = null
   description = "Endpoint HTTP(S) al que se enviarán los mensajes si se usa una suscripción push"
 }
+
+variable "repository_name" {
+  description = "Nombre del repositorio en Artifact Registry"
+  type        = string
+
+}
+
+variable "image_name" {
+  description = "Nombre de la imagen Docker"
+  type        = string
+
+}
+
+variable "cloud_run_service_name" {
+  description = "Nombre del servicio en Cloud Run"
+  type        = string
+
+}
+
+variable "db_host" {
+  description = "Host de la base de datos (IP o conexión Cloud SQL Proxy)"
+  type        = string
+
+}
+
+variable "port" {
+  description = "Puerto de conexión a la base de datos"
+  type        = string
+
+}
