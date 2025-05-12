@@ -76,3 +76,9 @@ variable "push_endpoint" {
   default     = null
   description = "Endpoint HTTP(S) al que se enviarán los mensajes si se usa una suscripción push"
 }
+
+variable bucket_pubsub_name {
+  type        = string
+  default     = "chatbot-name"
+  description = "description"
+}

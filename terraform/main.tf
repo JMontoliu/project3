@@ -15,10 +15,18 @@ module "bbdd" {
   db_password = var.db_password
 }
 
-module "pubsub" {
-  source = "./modules/pubsub"
-  topic_name = var.topic_name
-  subscription_name = var.subscription_name
-  subscription_labels = var.subscription_labels
-  push_endpoint = var.push_endpoint
+# module "pubsub" {
+#   source = "./modules/pubsub"
+#   topic_name = var.topic_name
+#   subscription_name = var.subscription_name
+#   subscription_labels = var.subscription_labels
+#   push_endpoint = var.push_endpoint
+# }
+
+module "pubsub_function" {
+ source = "./modules/pubsub-trigger-cf"
+ 
+ region             = var.region
+ project_id         = var.project_id
+ bucket_pubsub_name = var.bucket_pubsub_name
 }
