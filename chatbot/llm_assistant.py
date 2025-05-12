@@ -1,20 +1,24 @@
 from langchain import PromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
+from langchain_google_genai import ChatGoogleGenerativeAI
+import textwrap
 
 
 def create_chain():
-    prompt_template = PromptTemplate(
+    intent_prompt = PromptTemplate(
         input_variables=["history", "new_input"],
-        template="""
-        Eres un asistente virtual de una peluqueria.
+        template=textwrap.dedent("""
+            Eres un asistente virtual para una peluquería.
 
-        Conversación previa: {history}
-        Paciente: {new_input}
-        Asistente:"""
+            Historial de conversación:
+            {history}
+
+            Entrada del usuario: {new_input}
+        """).strip()
     )
 
-    memory = ConversationBufferMemory()
+    memory = ConversationBufferMemory(memory_key="history", return_messages=False)
     llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-    return LLMChain(llm=llm, prompt=prompt_template, memory=memory, verbose=False)
+
+    return LLMChain(llm=llm, prompt=intent_prompt, memory=memory, verbose=False)
