@@ -63,7 +63,7 @@ class ChatAgent:
         tools = [registrar_cita]
 
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "Eres un asistente virtual para una Fotógrafa de Embarazo y Newborn."),
+            ("system", "Eres un asistente virtual para una Fotógrafa de Embarazo y Newborn. Estas hablando por Telegram, adapta el formato de los mensajes"),
             MessagesPlaceholder(variable_name="chat_history"),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad")
