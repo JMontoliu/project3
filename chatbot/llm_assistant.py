@@ -8,17 +8,43 @@ from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import Tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from datetime import datetime
+import random
 
 # --- Tool Definition ---
 @tool
-def registrar_cita(name: str, email: str, user_id: int = 0) -> str:
-    """Registra una cita con nombre, email y user_id opcional."""
+def registrar_cita(
+    nombre: str,
+    telefono: str,
+    fecha_reserva: str,
+    hora_reserva: str
+) -> str:
+    """
+    Registra una cita con los siguientes datos:
+    - nombre
+    - telefono
+    - fecha_reserva
+    - hora_reserva
+    (id_persona aleatorio, created_at actual, status=False)
+    """
     url = "https://customer-api-196041114036.europe-west1.run.app/publish"
-    payload = {"data": {"user_id": user_id, "name": name, "email": email}}
+
+    payload = {
+        "data": {
+            "user_id": random.randint(1, 99999),  # Número aleatorio como ID
+            "nombre": nombre,
+            "telefono": telefono,
+            "fecha_reserva": fecha_reserva,
+            "hora_reserva": hora_reserva,
+            "status": False,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    }
+
     try:
         response = requests.post(url, json=payload)
         if response.status_code == 200:
-            return f"Cita registrada para {name} ({email}) con éxito."
+            return f"Cita registrada para {nombre} con éxito."
         else:
             return f"Error al registrar cita: {response.text}"
     except Exception as e:
