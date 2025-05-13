@@ -22,3 +22,17 @@ module "pubsub" {
   subscription_labels = var.subscription_labels
   push_endpoint = var.push_endpoint
 }
+
+module "api" {
+  source                 = "./modules/api"
+  project_id             = var.project_id
+  region                 = var.region
+  repository_name        = "docker-repo"
+  image_name             = "customer-api"
+  cloud_run_service_name = "customer-api"
+  db_host                = "127.0.0.1" 
+  port                   = "5432"
+  db_name                = var.db_name
+  db_user                = var.db_user
+  db_password            = var.db_password
+}

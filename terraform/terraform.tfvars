@@ -1,0 +1,5 @@
+repository_name        = "docker-repo"
+image_name             = "customer-api"
+cloud_run_service_name = "customer-api"
+db_host                = "127.0.0.1"
+port                   = "5432"
