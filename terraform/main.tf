@@ -1,18 +1,14 @@
-module "bucket-state" {
-  source = "./modules/bucket-state"
-  tf_state_bucket_name = var.tf_state_bucket_name
-  region = var.region
-}
-
 module "bbdd" {
-  source = "./modules/bbdd"
-  region = var.region
-  name_instance_bbdd = var.name_instance_bbdd
-  db_tier = var.db_tier
-  db_version = var.db_version
-  db_name = var.db_name
-  db_user = var.db_user
-  db_password = var.db_password
+  source     = "./modules/bbdd"
+  project_id = var.project_id
+  bq_dataset = var.bq_dataset
+
+  tables = [
+    {
+      name   = "customers"
+      schema = "main.json"
+    }
+  ]
 }
 
 module "pubsub" {
@@ -36,3 +32,17 @@ module "api" {
   db_user                = var.db_user
   db_password            = var.db_password
 }
+
+# module "cloud_function" {
+#   source = "./module/cloud_function"
+#   project_id     = var.project_id
+#   region         = var.region
+#   name           = "validation"
+#   entry_point    = "validation_dates"
+#   topic          = var.topic_hoteles
+#   env_variables  = {
+#     PROJECT_ID = var.project_id
+#     DATASET    = var.bq_dataset
+#     TABLE      = var.table_hoteles
+#   }
+# }
