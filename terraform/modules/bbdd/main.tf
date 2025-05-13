@@ -1,21 +1,16 @@
-resource "google_sql_database_instance" "instance" {
-  name             = var.name_instance_bbdd
-  region           = var.region
-  database_version = var.db_version
-  settings {
-    tier = var.db_tier
-  }
-
-  deletion_protection  = false
+# Crear el dataset
+resource "google_bigquery_dataset" "dataset" {
+  dataset_id = var.bq_dataset
+  project    = var.project_id
 }
 
-resource "google_sql_database" "database" {
-  name     = var.db_name
-  instance = google_sql_database_instance.instance.name
-}
-
-resource "google_sql_user" "user" {
-  name     = var.db_user
-  instance = google_sql_database_instance.instance.name
-  password = var.db_password
+# Crear múltiples tablas con su respectivo esquema
+resource "google_bigquery_table" "table" {
+  for_each  = { for t in var.tables : t.name => t }
+  
+  dataset_id = google_bigquery_dataset.dataset.dataset_id
+  table_id   = each.value.name
+  project    = var.project_id
+  schema = file("${path.module}/schemas/${each.value.schema}")
+  deletion_protection  = false  
 }

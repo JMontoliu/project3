@@ -1,12 +1,10 @@
 variable project_id {
   type        = string
-  default     = "dataproject03"
   description = "GCP project ID"
 }
 
 variable region {
   type        = string
-  default     = "europe-west1"
   description = "General region for all resources"
 }
 
@@ -105,4 +103,9 @@ variable "port" {
   description = "Puerto de conexión a la base de datos"
   type        = string
 
+}
+
+variable "bq_dataset" {
+  type        = string
+  description = "Nombre del dataset de BigQuery"
 }

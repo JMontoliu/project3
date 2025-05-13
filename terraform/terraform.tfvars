@@ -3,3 +3,8 @@ image_name             = "customer-api"
 cloud_run_service_name = "customer-api"
 db_host                = "127.0.0.1"
 port                   = "5432"
+project_id = "dataproject03"
+region     = "europe-west1"
+topic_name        = "chatbot-topic"
+bq_dataset = "chatbot_dataset"
+

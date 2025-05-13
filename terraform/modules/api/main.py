@@ -1,44 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import pubsub_v1
-import sqlalchemy
+from google.cloud import bigquery
 import json
 import os
 
 app = FastAPI()
 
-
+# Configuración Pub/Sub
 PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "chatbot-topic")
 PROJECT_ID = os.getenv("PROJECT_ID", "dataproject03")
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)
 
-
-DB_USER = os.getenv("admin")
-DB_PASS = os.getenv("admin")
-DB_NAME = os.getenv("db-chatbot")
-DB_CONNECTION_NAME = os.getenv("DB_CONNECTION_NAME")
-
-def get_db_engine():
-    return sqlalchemy.create_engine(
-        sqlalchemy.engine.url.URL.create(
-            drivername="mysql+pymysql",
-            username=DB_USER,
-            password=DB_PASS,
-            database=DB_NAME,
-            query={"unix_socket": f"/cloudsql/{DB_CONNECTION_NAME}"}
-        )
-    )
-
-
+# Modelo para publicación
 class PublishRequest(BaseModel):
     data: dict
-
-class Customer(BaseModel):
-    id: int
-    name: str
-    email: str
-
 
 @app.post("/publish")
 def publish_message(req: PublishRequest):
@@ -52,10 +29,23 @@ def publish_message(req: PublishRequest):
 @app.get("/read")
 def read_customers():
     try:
-        engine = get_db_engine()
-        with engine.connect() as conn:
-            result = conn.execute(sqlalchemy.text("SELECT id, name, email FROM customers"))
-            customers = [{"id": row.id, "name": row.name, "email": row.email} for row in result]
-        return customers
+        client = bigquery.Client(location="US")
+        query = """
+            SELECT id_persona, nombre, telefono, fecha_reserva, hora_reserva, status, created_at
+            FROM `dataproject03.chatbot_dataset.customers`
+        """
+        query_job = client.query(query)
+        results = []
+        for row in query_job:
+            results.append({
+                "id_persona": row["id_persona"],
+                "nombre": row["nombre"],
+                "telefono": row["telefono"],
+                "fecha_reserva": str(row["fecha_reserva"]),
+                "hora_reserva": str(row["hora_reserva"]),
+                "status": row["status"],
+                "created_at": str(row["created_at"])
+            })
+        return results
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error en DB: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al leer BigQuery: {e}")

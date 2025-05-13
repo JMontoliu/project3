@@ -1,41 +1,17 @@
-variable region {
+variable "project_id" {
   type        = string
-  default     = "europe-west1"
-  description = "General region for all resources"
+  description = "ID del proyecto GCP"
 }
 
-variable name_instance_bbdd {
+variable "bq_dataset" {
   type        = string
-  default     = "database-instance-chatbot"
-  description = "Name of the instance"
+  description = "ID del dataset de BigQuery"
 }
 
-variable db_tier {
-  type        = string
-  default     = "db-f1-micro"
-  description = "Database tier"
-}
-
-variable db_version {
-  type        = string
-  default     = "POSTGRES_15"
-  description = "Database version"
-}
-
-variable db_name {
-  type        = string
-  default     = "db-chatbot"
-  description = "Name of the database"
-}
-
-variable db_user {
-  type        = string
-  default     = "admin"
-  description = "Database user"
-}
-
-variable db_password {
-  type        = string
-  default     = "admin"
-  description = "Database password"
+variable "tables" {
+  description = "Lista de tablas con su esquema JSON"
+  type = list(object({
+    name   = string
+    schema = string  # Ruta relativa al módulo
+  }))
 }
