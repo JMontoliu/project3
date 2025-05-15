@@ -3,7 +3,7 @@
 import os
 from telegram import Update
 from telegram.ext import ContextTypes, Application, CommandHandler, MessageHandler, filters
-from llm_assistant import create_chain  # ahora importa desde chatbot.py
+from llm_assistant import ChatAgent
 from dotenv import load_dotenv
 
 user_chains = {}
@@ -18,7 +18,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id
 
     if user_id not in user_chains:
-        user_chains[user_id] = create_chain()
+        user_chains[user_id] = ChatAgent()
 
     chain = user_chains[user_id]
     user_input = update.message.text

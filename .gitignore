@@ -2,3 +2,4 @@ terraform.exe
 .terraform
 .env
 .venv
+venv
