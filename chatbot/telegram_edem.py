@@ -1,30 +1,39 @@
-# main.py
-
 import os
 from telegram import Update
 from telegram.ext import ContextTypes, Application, CommandHandler, MessageHandler, filters
-from llm_assistant import ChatAgent
 from dotenv import load_dotenv
+from llm_assistant import ChatAgentFactory, ChatSession
 
-user_chains = {}
 load_dotenv()
 
+# Shared agent for all users (initialized once)
+agent_factory = ChatAgentFactory()
+
+# Stores chat sessions per user
+user_sessions = {}
+
+
+# Handles the /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Hola! Soy un asistente virtual para reservar. ¿Cómo te puedo ayudar?"
     )
 
+# Handles incoming user messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
 
-    if user_id not in user_chains:
-        user_chains[user_id] = ChatAgent()
+    # Create a new session if it's a new user
+    if user_id not in user_sessions:
+        user_sessions[user_id] = ChatSession(agent_factory)
 
-    chain = user_chains[user_id]
+    session = user_sessions[user_id]
     user_input = update.message.text
-    response = chain.invoke(user_input)
+    response = session.invoke(user_input)
+
     await update.message.reply_text(response.strip())
 
+# Starts the Telegram bot
 def run_bot():
     application = Application.builder().token(os.getenv("TELEGRAM_API_KEY")).build()
     application.add_handler(CommandHandler("start", start))
@@ -32,7 +41,6 @@ def run_bot():
 
     print("Bot started...")
     application.run_polling()
-
 
 if __name__ == '__main__':
     run_bot()
