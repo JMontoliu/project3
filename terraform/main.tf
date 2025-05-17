@@ -1,6 +1,5 @@
 module "bbdd" {
   source     = "./modules/bbdd"
-  region     = var.region
   project_id = var.project_id
   bq_dataset = var.bq_dataset
 
@@ -47,4 +46,3 @@ module "api" {
 #     TABLE      = var.table_hoteles
 #   }
 # }
-
