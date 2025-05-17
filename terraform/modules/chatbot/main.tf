@@ -32,7 +32,7 @@ resource "null_resource" "build_push_image" {
 
 
 
-resource "google_cloud_run_v2_service" "service" {
+resource "google_cloud_run_v2_service" "chatbot" {
   name     = var.cloud_run_service_name
   location = var.region
   project  = var.project_id
@@ -68,7 +68,7 @@ resource "google_cloud_run_v2_service" "service" {
       }
 
       ports {
-        container_port = 8080
+        container_port = 8000
       }
       }
     }
