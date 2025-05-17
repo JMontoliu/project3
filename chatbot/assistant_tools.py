@@ -41,3 +41,57 @@ def registrar_cita(
             return f"Error al registrar cita: {response.text}"
     except Exception as e:
         return f"Error de conexión: {str(e)}"
+    
+
+@tool
+def modificar_reserva(
+    nombre: str,
+    telefono: str,
+    nueva_fecha: str,
+    nueva_hora: str
+) -> str:
+    """
+    Modifica una reserva existente.
+    - nombre
+    - telefono
+    - nueva_fecha
+    - nueva_hora
+    """
+    pass  # Implementar lógica de modificación de reserva
+
+
+@tool
+def cancelar_reserva(
+    nombre: str,
+    telefono: str
+) -> str:
+    """
+    Cancela una reserva existente.
+    - nombre
+    - telefono
+    """
+    pass  # Implementar lógica de cancelación
+
+
+@tool
+def consultar_horarios_disponibles(
+    fecha: str
+) -> str:
+    """
+    Consulta los horarios disponibles para una fecha dada.
+    - fecha
+    """
+    pass  # Implementar lógica de consulta de disponibilidad
+
+
+@tool
+def confirmar_reserva(
+    nombre: str,
+    telefono: str
+) -> str:
+    """
+    Confirma una reserva pendiente.
+    - nombre
+    - telefono
+    """
+    pass  # Implementar lógica de confirmación
