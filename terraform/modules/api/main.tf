@@ -32,13 +32,13 @@ resource "null_resource" "build_push_image" {
 
 
 
-resource "google_cloud_run_v2_service" "service" {
+resource "google_cloud_run_service" "service" {
   name     = var.cloud_run_service_name
   location = var.region
   project  = var.project_id
-  deletion_protection = false
 
   template {
+    spec {
       containers {
         image = "europe-west1-docker.pkg.dev/${var.project_id}/${var.repository_name}/${var.image_name}:latest"
 
@@ -72,10 +72,11 @@ resource "google_cloud_run_v2_service" "service" {
       }
       }
     }
-  
+  }
+
   traffic {
-    type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100
+    latest_revision = true
   }
 
   depends_on = [ null_resource.build_push_image ]
@@ -86,7 +87,7 @@ resource "google_cloud_run_v2_service" "service" {
 resource "google_cloud_run_service_iam_member" "invoker" {
   project  = var.project_id
   location = var.region
-  service  = google_cloud_run_v2_service.service.name
+  service  = google_cloud_run_service.service.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }

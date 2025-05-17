@@ -109,13 +109,3 @@ variable "bq_dataset" {
   type        = string
   description = "Nombre del dataset de BigQuery"
 }
-
-variable "service" {
-  type        = string
-  description = "Nombre del servicio Cloud Run al que enviarás el POST"
-}
-
-variable "api_url" {
-  type        = string
-  description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
-}
