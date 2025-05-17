@@ -1,0 +1,28 @@
+services:
+  telegram_gateway:
+    build:
+      context: ./telegram # Ruta a la carpeta con el Dockerfile de telegram_gateway
+      dockerfile: Dockerfile
+    container_name: telegram_gateway_container
+    env_file:
+      - ./.env # Carga las variables desde el archivo .env en la raíz
+    volumes:
+      - ./telegram/app:/usr/src/app/app # Monta el código para desarrollo (hot-reloading)
+    depends_on:
+      - chatbot_core # Asegura que chatbot_core se inicie antes si es necesario (no estrictamente ahora)
+    restart: unless-stopped # Reinicia el contenedor si se detiene inesperadamente
+
+  chatbot_core:
+    build:
+      context: ./chatbot # Ruta a la carpeta con el Dockerfile de chatbot_core
+      dockerfile: Dockerfile
+    container_name: chatbot_core_container
+    ports:
+      - "8000:8000" # Expondremos el puerto 8000 del contenedor al 8000 del host
+    volumes:
+      - ./chatbot/app:/usr/src/app/app # Monta el código para desarrollo
+    environment:
+      # Aquí podrías poner variables de entorno específicas para chatbot_core si las necesita
+      # Por ejemplo: LLM_API_KEY=${LLM_API_KEY} (si tienes LLM_API_KEY en tu .env)
+      PYTHONUNBUFFERED: 1 # Para que los logs de Python aparezcan inmediatamente
+    restart: unless-stopped

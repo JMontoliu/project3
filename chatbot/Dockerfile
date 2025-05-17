@@ -1,17 +1,25 @@
-# Use a base image of Python 3.11 in its "slim" version
-FROM python:3.11-slim
+# chatbot_core/Dockerfile
+FROM python:3.13-slim
 
-# Set the working directory to /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy the requirements file (requirements.txt) to the working directory
-COPY requirements.txt .
+# Prevenir que Python escriba archivos .pyc al disco (opcional)
+ENV PYTHONDONTWRITEBYTECODE 1
+# Asegura que la salida de Python se muestre inmediatamente (útil para logs en Docker)
+ENV PYTHONUNBUFFERED 1
 
-# Install the application's dependencies
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application content to the working directory
-COPY . .
+# Copia el código de la aplicación
+# Asumiendo que tu código está en una subcarpeta 'app'
+COPY ./app ./app
 
-# Run the bot's main script
-CMD ["python", "telegram.py"]
+# Exponer el puerto en el que FastAPI/Uvicorn escuchará
+EXPOSE 8000
+
+# Comando para ejecutar la aplicación FastAPI con Uvicorn
+# Escucha en todas las interfaces (0.0.0.0) en el puerto 8000
+# --reload es para desarrollo, permite que uvicorn se reinicie si cambias el código.
+# Quítalo para producción.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
