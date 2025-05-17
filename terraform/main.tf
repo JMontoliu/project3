@@ -39,6 +39,16 @@ module "pubsub" {
 #   db_password            = var.db_password
 # }
 
+module "injectors" {
+  source          = "./modules/injectors"
+  project_id      = var.project_id
+  region          = var.region
+  api_url         = module.api.api_url
+  chatbot         = module.chatbot.env_vars_api
+
+  depends_on = [ module.api ]
+}
+
 # module "cloud_function" {
 #   source = "./module/cloud_function"
 #   project_id     = var.project_id
