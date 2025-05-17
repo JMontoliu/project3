@@ -12,6 +12,17 @@ variable "tables" {
   description = "Lista de tablas con su esquema JSON"
   type = list(object({
     name   = string
-    schema = string  # Ruta relativa al módulo
+    schema = string  
   }))
+}
+
+variable "region" {
+  type        = string
+  description = "Región de GCP"
+}
+
+variable "firestore_database_name" {
+  description = "El nombre de la base de datos Firestore."
+  type        = string
+  default     = "customers"
 }
