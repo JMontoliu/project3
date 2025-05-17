@@ -12,6 +12,13 @@ resource "google_pubsub_topic" "default" {
   name = var.topic
 }
 
+data "archive_file" "function_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}"
+  output_path = "${path.module}/${var.name}.zip"
+  excludes    = [".tf", ".zip"]
+}
+
 resource "google_storage_bucket_object" "function_zip" {
   name   = "${var.name}.zip"
   bucket = google_storage_bucket.function_bucket.name
@@ -44,7 +51,7 @@ resource "google_cloudfunctions2_function" "function" {
   event_trigger {
     trigger_region = var.region
     event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
-    pubsub_topic   = "projects/${var.project_id}/topics/${var.topic}"
+    pubsub_topic   = google_pubsub_topic.default.id
     retry_policy   = "RETRY_POLICY_RETRY"
   }
 

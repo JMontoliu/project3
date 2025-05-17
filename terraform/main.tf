@@ -17,48 +17,53 @@ module "bbdd" {
   ]
 }
 
-module "pubsub" {
-  source = "./modules/pubsub"
-  topic_name = var.topic_name
-  subscription_name = var.subscription_name
-  subscription_labels = var.subscription_labels
-  push_endpoint = var.push_endpoint
+module "api" {
+  source                 = "./modules/api"
+  project_id             = var.project_id
+  region                 = var.region
+  repository_name        = "docker-repo"
+  image_name             = "customer-api"
+  cloud_run_service_name = "customer-api"
+  db_host                = "127.0.0.1" 
+  port                   = "5432"
+  db_name                = var.db_name
+  db_user                = var.db_user
+  db_password            = var.db_password
 }
 
-# module "api" {
-#   source                 = "./modules/api"
-#   project_id             = var.project_id
-#   region                 = var.region
-#   repository_name        = "docker-repo"
-#   image_name             = "customer-api"
-#   cloud_run_service_name = "customer-api"
-#   db_host                = "127.0.0.1" 
-#   port                   = "5432"
-#   db_name                = var.db_name
-#   db_user                = var.db_user
-#   db_password            = var.db_password
+# module "injectors" {
+#   source          = "./modules/injectors"
+#   project_id      = var.project_id
+#   region          = var.region
+#   api_url         = module.api.api_url
+#   chatbot         = module.chatbot.env_vars_api
+
+#   depends_on = [ module.api, module.bbdd ]
 # }
 
-module "injectors" {
-  source          = "./modules/injectors"
-  project_id      = var.project_id
-  region          = var.region
-  api_url         = module.api.api_url
-  chatbot         = module.chatbot.env_vars_api
+module "cloud_function" {
+  name        = "cloud_function"
+  source      = "./modules/cloud_function"
+  project_id  = var.project_id
+  region      = var.region
+  entry_point = var.entry_point
+  topic       = var.topic
 
-  depends_on = [ module.api ]
+  env_variables = {
+    # BigQuery
+    PROJECT_ID = var.project_id
+    DATASET    = var.bq_dataset
+    TABLES =  "customers"
+
+
+    # PostgreSQL
+    PG_HOST     = var.db_host
+    PG_PORT     = var.port 
+    PG_USER     = var.db_user
+    PG_PASSWORD = var.postgres_password
+    PG_DATABASE = var.postgres_db_name
+
+    # Logging
+    LOG_LEVEL   = "INFO"
+  }
 }
-
-# module "cloud_function" {
-#   source = "./module/cloud_function"
-#   project_id     = var.project_id
-#   region         = var.region
-#   name           = "validation"
-#   entry_point    = "validation_dates"
-#   topic          = var.topic_hoteles
-#   env_variables  = {
-#     PROJECT_ID = var.project_id
-#     DATASET    = var.bq_dataset
-#     TABLE      = var.table_hoteles
-#   }
-# }

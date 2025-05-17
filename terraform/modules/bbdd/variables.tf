@@ -9,12 +9,13 @@ variable "bq_dataset" {
 }
 
 variable "tables" {
-  description = "Lista de tablas con su esquema JSON"
   type = list(object({
     name   = string
     schema = string
   }))
+  description = "Lista de tablas BigQuery: nombre y archivo de esquema JSON"
 }
+
 
 variable "region" {
   type        = string
@@ -37,7 +38,6 @@ variable "postgres_tier" {
 variable "postgres_db_name" {
   type        = string
   description = "Nombre de la base de datos PostgreSQL"
-  default     = "customers"
 }
 
 variable "postgres_user" {
@@ -48,5 +48,4 @@ variable "postgres_user" {
 variable "postgres_password" {
   type        = string
   description = "Contraseña para el usuario de PostgreSQL"
-  sensitive   = true
 }

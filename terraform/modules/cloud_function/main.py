@@ -1,10 +1,16 @@
 import base64
 import json
 import os
+import logging
 import functions_framework
 import psycopg2
 from datetime import datetime
 from google.cloud import bigquery
+
+# Configuración de logging
+debug_level = os.environ.get('LOG_LEVEL', 'INFO')
+logging.basicConfig(level=getattr(logging, debug_level))
+logger = logging.getLogger(__name__)
 
 # Configuración desde variables de entorno
 PROJECT_ID = os.environ.get('PROJECT_ID')
@@ -42,9 +48,10 @@ def get_pg_connection():
             password=PG_PASSWORD,
             database=PG_DATABASE
         )
+        logger.info("Conexión a PostgreSQL establecida.")
         return conn
     except Exception as e:
-        print(f"Error al conectar a PostgreSQL: {e}")
+        logger.error(f"Error al conectar a PostgreSQL: {e}")
         raise
 
 def ensure_pg_table_exists(conn):
@@ -53,9 +60,9 @@ def ensure_pg_table_exists(conn):
         with conn.cursor() as cursor:
             cursor.execute(PG_TABLE_SCHEMA)
             conn.commit()
-            print("Tabla PostgreSQL verificada/creada correctamente")
+            logger.info("Tabla PostgreSQL verificada/creada correctamente.")
     except Exception as e:
-        print(f"Error al crear la tabla en PostgreSQL: {e}")
+        logger.error(f"Error al crear la tabla en PostgreSQL: {e}")
         raise
 
 def insert_into_pg(conn, data):
@@ -83,9 +90,9 @@ def insert_into_pg(conn, data):
                 data['created_at']
             ))
             conn.commit()
-            print(f"Datos insertados en PostgreSQL para id_persona: {data['id_persona']}")
+            logger.info(f"Datos insertados en PostgreSQL para id_persona: {data['id_persona']}")
     except Exception as e:
-        print(f"Error al insertar en PostgreSQL: {e}")
+        logger.error(f"Error al insertar en PostgreSQL: {e}")
         conn.rollback()
         raise
 
@@ -93,7 +100,6 @@ def insert_into_bigquery(data):
     """Inserta datos en BigQuery"""
     client = bigquery.Client(project=PROJECT_ID)
     table_id = f"{PROJECT_ID}.{BQ_DATASET}.{BQ_TABLE}"
-    
     rows_to_insert = [{
         'id_persona': data['id_persona'],
         'nombre': data['nombre'],
@@ -103,60 +109,46 @@ def insert_into_bigquery(data):
         'status': data['status'],
         'created_at': data['created_at']
     }]
-    
     try:
         errors = client.insert_rows_json(table_id, rows_to_insert)
-        if errors == []:
-            print(f"Datos insertados en BigQuery para id_persona: {data['id_persona']}")
+        if not errors:
+            logger.info(f"Datos insertados en BigQuery para id_persona: {data['id_persona']}")
         else:
-            print(f"Errores al insertar en BigQuery: {errors}")
+            logger.error(f"Errores al insertar en BigQuery: {errors}")
             raise Exception(f"Error en BigQuery: {errors}")
     except Exception as e:
-        print(f"Error al insertar en BigQuery: {e}")
+        logger.error(f"Error al insertar en BigQuery: {e}")
         raise
 
 @functions_framework.cloud_event
 def process_pubsub_message(cloud_event):
     """Función principal que se invoca desde PubSub en GCF v2"""
+    # Log al activarse la función
+    logger.info("Cloud Function invocada: process_pubsub_message ha iniciado el procesamiento.")
     try:
-        # Extraer datos del CloudEvent
         if cloud_event.data and cloud_event.data.get('message'):
             message = cloud_event.data.get('message', {})
             if 'data' in message:
-                # Decodificar el mensaje de PubSub
                 pubsub_message = base64.b64decode(message['data']).decode('utf-8')
                 data = json.loads(pubsub_message)
-                print(f"Mensaje recibido: {data}")
-                
-                # Validaciones básicas
+                logger.info(f"Mensaje recibido del Pub/Sub: {data}")
                 required_fields = ['id_persona', 'nombre', 'telefono', 'fecha_reserva', 'hora_reserva', 'status']
                 for field in required_fields:
                     if field not in data:
-                        print(f"Campo requerido no encontrado: {field}")
+                        logger.warning(f"Campo requerido no encontrado: {field}")
                         return
-                
-                # Añadir timestamp si no existe
                 if 'created_at' not in data:
                     data['created_at'] = datetime.now().isoformat()
-                
-                # Establecer conexión con PostgreSQL
                 conn = get_pg_connection()
-                
-                # Asegurar que la tabla existe
                 ensure_pg_table_exists(conn)
-                
-                # Insertar en ambas bases de datos
                 insert_into_pg(conn, data)
                 insert_into_bigquery(data)
-                
-                # Cerrar conexión
                 conn.close()
-                
-                print("Procesamiento completado exitosamente")
+                logger.info("Procesamiento completado exitosamente.")
             else:
-                print("No hay datos en el mensaje")
+                logger.warning("No hay datos en el mensaje.")
         else:
-            print("Evento no contiene datos válidos")
+            logger.warning("Evento no contiene datos válidos.")
     except Exception as e:
-        print(f"Error en el procesamiento: {e}")
+        logger.error(f"Error en el procesamiento: {e}")
         raise

@@ -8,15 +8,6 @@ variable "region" {
   description = "Región donde se desplegará la función"
 }
 
-variable "name" {
-  type        = string
-  description = "Nombre de la función (y del archivo zip)"
-}
-
-variable "entry_point" {
-  type        = string
-  description = "Nombre de la función Python que se ejecuta al dispararse el evento"
-}
 
 variable "topic" {
   type        = string
@@ -27,4 +18,15 @@ variable "env_variables" {
   type        = map(string)
   default     = {}
   description = "Variables de entorno para la función"
+}
+
+variable "entry_point" {
+  type        = string
+  description = "Nombre de la función que se ejecuta al recibir un mensaje"
+  
+}
+
+variable "name" {
+  type        = string
+  description = "Nombre de la función"
 }

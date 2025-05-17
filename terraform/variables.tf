@@ -14,28 +14,9 @@ variable tf_state_bucket_name {
   description = "Name of the bucket for terraform state"
 }
 
-
-variable name_instance_bbdd {
-  type        = string
-  default     = "database-instance-chatbot"
-  description = "Name of the instance"
-}
-
-variable db_tier {
-  type        = string
-  default     = "db-f1-micro"
-  description = "Database tier"
-}
-
-variable db_version {
-  type        = string
-  default     = "POSTGRES_15"
-  description = "Database version"
-}
-
 variable db_name {
   type        = string
-  default     = "db-chatbot"
+  default     = "costumers"
   description = "Name of the database"
 }
 
@@ -45,22 +26,28 @@ variable db_user {
   description = "Database user"
 }
 
+variable "postgres_db_name" {
+  type        = string
+  description = "Nombre de la base de datos PostgreSQL"
+  default     = "customers"
+}
+
+variable "postgres_password" {
+  type        = string
+  description = "Contraseña para el usuario de PostgreSQL"
+  default = "admin"
+}
+
 variable db_password {
   type        = string
   default     = "admin"
   description = "Database password"
 }
 
-variable topic_name {
+variable topic {
   description = "The name of the Pub/Sub topic"
   type        = string
-    default     = "chatbot-topic"
-}
-
-variable subscription_name {
-  description = "The name of the Pub/Sub subscription"
-  type        = string
-    default     = "chatbot-subscription"
+  default     = "chatbot-topic"
 }
 
 variable subscription_labels {
@@ -129,4 +116,17 @@ variable "service" {
 variable "api_url" {
   type        = string
   description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
+}
+
+variable "entry_point" {
+  type        = string
+  description = "Nombre de la función que se ejecuta al recibir un mensaje"
+  default = "process_pubsub_message"
+  
+}
+
+variable "name" {
+  type        = string
+  description = "Nombre de la función"
+  default     = "insert_data_function"
 }
