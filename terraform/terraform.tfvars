@@ -5,9 +5,7 @@ db_host                = "127.0.0.1"
 port                   = "5432"
 project_id = "dataproject03"
 region     = "europe-west1"
-topic_name        = "chatbot-topic"
+topic        = "chatbot-topic"
 bq_dataset = "chatbot_dataset"
-postgres_user = "admin"
-postgres_password = "admin"
 
 
