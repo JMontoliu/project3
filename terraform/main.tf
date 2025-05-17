@@ -2,6 +2,12 @@ module "bbdd" {
   source     = "./modules/bbdd"
   project_id = var.project_id
   bq_dataset = var.bq_dataset
+  region               = var.region
+  postgres_instance_name = var.postgres_instance_name
+  postgres_tier        = var.postgres_tier
+  postgres_db_name     = var.db_name
+  postgres_user        = var.db_user  
+  postgres_password    = var.db_password
 
   tables = [
     {
@@ -19,19 +25,19 @@ module "pubsub" {
   push_endpoint = var.push_endpoint
 }
 
-module "api" {
-  source                 = "./modules/api"
-  project_id             = var.project_id
-  region                 = var.region
-  repository_name        = "docker-repo"
-  image_name             = "customer-api"
-  cloud_run_service_name = "customer-api"
-  db_host                = "127.0.0.1" 
-  port                   = "5432"
-  db_name                = var.db_name
-  db_user                = var.db_user
-  db_password            = var.db_password
-}
+# module "api" {
+#   source                 = "./modules/api"
+#   project_id             = var.project_id
+#   region                 = var.region
+#   repository_name        = "docker-repo"
+#   image_name             = "customer-api"
+#   cloud_run_service_name = "customer-api"
+#   db_host                = "127.0.0.1" 
+#   port                   = "5432"
+#   db_name                = var.db_name
+#   db_user                = var.db_user
+#   db_password            = var.db_password
+# }
 
 # module "cloud_function" {
 #   source = "./module/cloud_function"

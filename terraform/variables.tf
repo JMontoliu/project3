@@ -109,3 +109,15 @@ variable "bq_dataset" {
   type        = string
   description = "Nombre del dataset de BigQuery"
 }
+
+variable "postgres_instance_name" {
+  type        = string
+  description = "Nombre de la instancia de Cloud SQL PostgreSQL"
+  default     = "postgres-instance"
+}
+
+variable "postgres_tier" {
+  type        = string
+  description = "Tier para la instancia de Cloud SQL"
+  default     = "db-f1-micro"
+}
