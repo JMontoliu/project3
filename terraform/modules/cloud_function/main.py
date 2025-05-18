@@ -24,13 +24,14 @@ def get_postgres_connection():
         host=PG_HOST,
         port=PG_PORT
     )
-    create_table_if_not_exists(conn)
+    create_tables_if_not_exist(conn)
     return conn
 
-def create_table_if_not_exists(conn):
+def create_tables_if_not_exist(conn):
     try:
         cursor = conn.cursor()
-        create_table_query = """
+
+        create_customers_query = """
     CREATE TABLE IF NOT EXISTS customers (
     id_persona VARCHAR(255) NOT NULL,
     id_autonomo VARCHAR(255) NOT NULL,
@@ -43,18 +44,64 @@ def create_table_if_not_exists(conn):
     PRIMARY KEY (id_persona)
     );
         """
-        cursor.execute(create_table_query)
+        cursor.execute(create_customers_query)
+
+        create_clients_query = """
+    CREATE TABLE IF NOT EXISTS clients (
+    id_persona VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (id_persona)
+    );
+        """
+        cursor.execute(create_clients_query)
+        
         conn.commit()
         cursor.close()
-        logging.info("Table injured_players created (if it didn't exist).")
+        logging.info("Tables created (if they didn't exist).")
     except Exception as e:
-        logging.error(f"Error creating table: {e}")
+        logging.error(f"Error creating tables: {e}")
+        raise
+
+def register_client(conn, data):
+    try:
+        cursor = conn.cursor()
+        
+        # Verificar si el cliente ya existe
+        check_query = """
+        SELECT COUNT(*) FROM clients
+        WHERE id_persona = %s
+        """
+        cursor.execute(check_query, (data["id_persona"],))
+        exists = cursor.fetchone()[0] > 0
+        
+        if not exists:
+
+            insert_query = """
+            INSERT INTO clients (id_persona, nombre, telefono, created_at)
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, (
+                data["id_persona"],
+                data["nombre"],
+                data["telefono"],
+                data["created_at"]
+            ))
+            logging.info(f"Nuevo cliente registrado: {data['id_persona']}")
+        
+        cursor.close()
+    except Exception as e:
+        logging.error(f"Error registering client: {e}")
         raise
 
 
 def insert_postgres(data):
     try:
         conn = get_postgres_connection()
+        
+        register_client(conn, data)
+        
         cursor = conn.cursor()
 
         if data["status"] == "registrado":
