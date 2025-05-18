@@ -1,0 +1,163 @@
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Embarazo basic
+TIPO_SESION: Embarazo
+PRECIO: €140.00 (Original €150.00)
+DURACION: 1 hora
+UBICACION_SESION: Exterior (Basado en la imagen en la playa con pareja).
+DESCRIPCION: Una sesión de embarazo natural y emotiva para parejas, idealmente realizada en un entorno exterior como la playa. Se enfoca en capturar la conexión, el amor y la ilusión de la dulce espera de una manera sencilla y hermosa. Es una opción perfecta para quienes desean un recuerdo fundamental y precioso de esta etapa.
+CARACTERISTICAS_CLAVE:
+- Sesión fotográfica de embarazo para la pareja.
+- Realizada en localizaciones exteriores (ej. playa).
+- Estilo natural y centrado en la conexión emocional.
+- Ideal para un recuerdo esencial de la maternidad.
+PARA_QUIEN: Parejas esperando un bebé que deseen una sesión fotográfica bonita y natural en exterior. Recomendada entre las semanas 28 y 34 de gestación.
+PALABRAS_CLAVE: embarazo, sesión embarazo, fotos pareja embarazada, maternidad, playa, exterior, básico, recuerdo embarazo, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €140.00. La disponibilidad y detalles finales se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Embarazo Medium
+TIPO_SESION: Embarazo
+PRECIO: €160.00 (Original €190.00)
+DURACION: 2 horas
+UBICACION_SESION: Exterior (Basado en la imagen en la playa, con detalle de patucos, sugiriendo un enfoque más detallista).
+DESCRIPCION: Una sesión de embarazo más completa, perfecta para capturar no solo la conexión de pareja sino también detalles tiernos como los primeros patucos del bebé, en un entorno exterior. Ideal para quienes buscan un recuerdo emotivo y con algunos elementos simbólicos.
+CARACTERISTICAS_CLAVE:
+- Sesión de embarazo en exterior.
+- Incluye fotos de pareja y detalles simbólicos (ej. patucos, ecografías).
+- Estilo emotivo y detallista.
+- Mayor variedad de tomas que la opción "basic".
+PARA_QUIEN: Parejas o futuras mamás que deseen una sesión en exterior con un enfoque en los detalles y la emoción del embarazo. Recomendada entre las semanas 28 y 34 de gestación.
+PALABRAS_CLAVE: embarazo, sesión embarazo medium, maternidad, fotos con detalles, patucos bebé, playa, exterior, recuerdo detallado, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €160.00. La disponibilidad y detalles finales se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Embarazo Premium
+TIPO_SESION: Embarazo, Familia
+PRECIO: €200.00 (Original €230.00)
+DURACION: Aproximadamente 3 horas
+UBICACION_SESION: Exterior (Basado en la imagen en la playa, con un niño abrazando la barriga).
+DESCRIPCION: La experiencia de embarazo más completa y familiar, ideal para incluir a hermanitos en este recuerdo especial. Realizada en exterior, captura la alegría y la conexión de toda la familia ante la llegada del nuevo miembro, junto con hermosos retratos de la futura mamá.
+CARACTERISTICAS_CLAVE:
+- Sesión de embarazo en exterior.
+- Permite la participación de la pareja e hijos (hermanitos).
+- Enfoque en la interacción familiar y la emoción compartida.
+- Ideal para un recuerdo familiar completo y de alta calidad.
+PARA_QUIEN: Familias esperando un nuevo bebé, futuras mamás que deseen incluir a su pareja e hijos en la sesión. Recomendada entre las semanas 28 y 34 de gestación.
+PALABRAS_CLAVE: embarazo, sesión embarazo premium, fotos embarazo familia, embarazo con hijos, maternidad, playa, exterior, recuerdo familiar completo, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €200.00. La disponibilidad y detalles finales se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Embarazo en estudio
+TIPO_SESION: Embarazo
+PRECIO: €180.00 (Original €200.00)
+DURACION: 1.5 horas
+UBICACION_SESION: Interior (Estudio).
+DESCRIPCION: Una sesión de embarazo íntima y elegante realizada en la comodidad y privacidad del estudio. Ideal para retratos artísticos de la futura mamá, donde se puede jugar con la iluminación y diferentes atuendos para resaltar la belleza de la maternidad. También puede incluir a la pareja.
+CARACTERISTICAS_CLAVE:
+- Sesión de embarazo realizada en estudio fotográfico.
+- Ambiente controlado, ideal para cualquier época del año.
+- Enfoque en retratos artísticos y elegantes de la futura mamá.
+- Posibilidad de incluir a la pareja.
+- Opción de varios cambios de vestuario (consultar con Sarashot).
+PARA_QUIEN: Futuras mamás (y parejas) que prefieran la comodidad y el estilo de una sesión en estudio, buscando retratos más íntimos o artísticos. Recomendada entre las semanas 28 y 34 de gestación.
+PALABRAS_CLAVE: embarazo, sesión embarazo estudio, fotos embarazo interior, maternidad estudio, book embarazada, retrato maternidad, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €180.00. La disponibilidad y detalles finales se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack Premium Newborn
+TIPO_SESION: Newborn, Pack
+PRECIO: €220.00 (Original €250.00)
+DURACION: 3.5 horas 
+UBICACION_SESION: Interior (Estudio, típico para newborn).
+DESCRIPCION: Una experiencia fotográfica de recién nacido de alta calidad, enfocada en capturar la ternura y los detalles únicos de tu bebé en sus primeros días. Este pack premium probablemente incluye una mayor variedad de poses, atrezzo y posiblemente más imágenes finales que una sesión básica. La imagen muestra al bebé sostenido delicadamente.
+CARACTERISTICAS_CLAVE:
+- Sesión fotográfica especializada en recién nacidos.
+- Enfoque artístico y detallado.
+- Ambiente seguro y confortable en estudio.
+- Probablemente incluye más tiempo de sesión y variedad de atrezzo.
+PARA_QUIEN: Recién nacidos idealmente entre 5 y 15 días de vida, para padres que buscan un recuerdo premium y muy completo de esta etapa.
+PALABRAS_CLAVE: newborn, recién nacido, pack premium bebé, sesión fotos bebé estudio, fotografía artística bebé, primeros días, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €220.00. La disponibilidad y detalles finales del pack se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack Basic newborn
+TIPO_SESION: Newborn, Pack
+PRECIO: €140.00 (Original €150.00)
+DURACION: 2.5 horas 
+UBICACION_SESION: Interior (Estudio, típico para newborn).
+DESCRIPCION: Un pack esencial para atesorar los primeros momentos de tu recién nacido. Esta sesión se centra en capturar la dulzura de tu bebé con un estilo sencillo y natural. La imagen muestra al bebé en un columpio con un pequeño elefante de juguete.
+CARACTERISTICAS_CLAVE:
+- Sesión fotográfica de recién nacido.
+- Estilo natural y tierno.
+- Realizada en estudio.
+- Opción más accesible para un recuerdo hermoso.
+PARA_QUIEN: Recién nacidos idealmente entre 5 y 15 días de vida, para padres que buscan una sesión newborn de calidad con un enfoque más sencillo y directo.
+PALABRAS_CLAVE: newborn, recién nacido, pack básico bebé, sesión fotos bebé, fotografía infantil estudio, primeros días, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €140.00. La disponibilidad y detalles finales del pack se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack Medium Newborn
+TIPO_SESION: Newborn, Pack
+PRECIO: €170.00 (Original €180.00)
+DURACION: 3 horas 
+UBICACION_SESION: Interior (Estudio, típico para newborn).
+DESCRIPCION: Un pack de recién nacido equilibrado que ofrece una bonita variedad de recuerdos de los primeros días de tu bebé. La imagen muestra al bebé durmiendo plácidamente sobre un fondo rosa y con un gorrito a juego, sugiriendo un cuidado estilismo.
+CARACTERISTICAS_CLAVE:
+- Sesión fotográfica de recién nacido.
+- Enfoque en poses dulces y estilismo cuidado.
+- Realizada en estudio.
+- Buen equilibrio entre variedad y precio.
+PARA_QUIEN: Recién nacidos idealmente entre 5 y 15 días de vida, para padres que desean una sesión con estilismo y una buena selección de imágenes.
+PALABRAS_CLAVE: newborn, recién nacido, pack medium bebé, sesión bebé estudio, fotografía artística bebé, estilismo bebé, Valencia, oferta
+NOTA_PRECIO_DISPONIBILIDAD: Precio actual €170.00. La disponibilidad y detalles finales del pack se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack familiar newborn
+TIPO_SESION: Newborn, Familia, Pack
+PRECIO: €150.00
+DURACION: 3 horas
+UBICACION_SESION: Interior (Estudio, típico para newborn y retratos familiares).
+DESCRIPCION: Este pack captura no solo la ternura de tu recién nacido, sino también los primeros momentos de conexión y amor con sus padres. La imagen muestra a los padres mirando con adoración a su bebé. Ideal para un recuerdo familiar completo de esta nueva etapa.
+CARACTERISTICAS_CLAVE:
+- Sesión fotográfica de recién nacido.
+- Incluye fotografías del bebé con sus padres.
+- Enfoque en la conexión familiar y la emoción.
+- Realizada en estudio.
+PARA_QUIEN: Recién nacidos (idealmente 5-15 días) y sus padres, para familias que desean un recuerdo conjunto de la llegada del bebé.
+PALABRAS_CLAVE: newborn, recién nacido, pack familiar, fotos bebé y padres, sesión familia recién nacido, recuerdo familiar, estudio, Valencia
+NOTA_PRECIO_DISPONIBILIDAD: Precio €150.00. La disponibilidad y detalles finales del pack se confirman directamente con Sarashot al contactar.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack Medium Newborn + sesión seguimiento
+TIPO_SESION: Newborn, Seguimiento, Pack
+PRECIO: €280.00
+DURACION: Múltiples sesiones. Sesión Newborn: aprox. 3 horas por sesion 
+UBICACION_SESION: Interior (Estudio, típico para newborn y seguimiento de bebés).
+DESCRIPCION: Un pack completo para documentar el crecimiento de tu bebé, comenzando con una hermosa sesión de recién nacido (Newborn Medium) y complementada con una o varias sesiones de seguimiento posteriores (ej. a los 6 meses o al año). La imagen muestra a un bebé en una cesta, con atrezzo.
+COMPONENTES_PACK: Sesión Medium Newborn, Sesión(es) de seguimiento (confirmar cantidad y edades con Sarashot).
+CARACTERISTICAS_CLAVE:
+- Cubre desde los primeros días hasta etapas posteriores del bebé.
+- Incluye una sesión de recién nacido de nivel intermedio.
+- Sesiones de seguimiento para capturar la evolución del bebé.
+- Realizadas en estudio.
+PARA_QUIEN: Padres que desean un recuerdo evolutivo del primer año de su bebé, comenzando con una sesión newborn completa.
+PALABRAS_CLAVE: pack newborn y seguimiento, sesión bebé evolutiva, fotos primer año bebé, pack medium newborn, fotografía infantil, estudio, Valencia
+NOTA_PRECIO_DISPONIBILIDAD: Precio €280.00. Incluye sesión newborn y de seguimiento. La cantidad exacta de sesiones de seguimiento, las edades ideales y la disponibilidad se confirman directamente con Sarashot.
+=== PRODUCTO FIN ===
+=== PRODUCTO INICIO ===
+NOMBRE_PRODUCTO: Pack Premium Newborn + Sesión 6 meses + Sesión 1 año
+TIPO_SESION: Newborn, Seguimiento, Pack
+PRECIO: €450.00
+DURACION: Múltiples sesiones. Sesión Newborn: aprox. 3 horas  por sesión
+UBICACION_SESION: Interior (Estudio, típico para newborn y seguimiento de bebés).
+DESCRIPCION: El pack más completo para atesorar el primer año de vida de tu bebé con la máxima calidad. Comienza con una sesión Premium Newborn y continúa con dos importantes sesiones de seguimiento: a los seis meses (cuando suelen sentarse) y al cumplir su primer año. La imagen muestra un bebé en una cesta con un cuidado estilismo.
+COMPONENTES_PACK: Sesión Premium Newborn, Sesión de seguimiento a los 6 meses, Sesión de seguimiento al año.
+CARACTERISTICAS_CLAVE:
+- Cobertura fotográfica premium del primer año del bebé.
+- Incluye una sesión de recién nacido de alta gama.
+- Dos sesiones de seguimiento en momentos clave del desarrollo.
+- Realizadas en estudio con estilismo profesional.
+PARA_QUIEN: Padres que buscan la experiencia más completa y de mayor calidad para documentar el primer año de su bebé, desde sus primeros días.
+PALABRAS_CLAVE: pack premium newborn y seguimiento, fotos bebé primer año completo, sesión 6 meses, sesión 1 año, fotografía evolutiva premium, estudio, Valencia
+NOTA_PRECIO_DISPONIBILIDAD: Precio €450.00. Incluye sesión Premium Newborn y dos sesiones de seguimiento (6 meses y 1 año). La disponibilidad y detalles finales se confirman directamente con Sarashot.
+=== PRODUCTO FIN ===
