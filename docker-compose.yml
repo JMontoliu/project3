@@ -17,6 +17,8 @@ services:
       context: ./chatbot # Ruta a la carpeta con el Dockerfile de chatbot_core
       dockerfile: Dockerfile
     container_name: chatbot_core_container
+    env_file:
+      - .env 
     ports:
       - "8000:8000" # Expondremos el puerto 8000 del contenedor al 8000 del host
     volumes:
