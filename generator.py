@@ -16,17 +16,18 @@ topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
 def generar_reserva():
     return {
-        "id_persona": str(uuid.uuid4()),
-        "nombre": fake.name(),
+        "id_persona": "idpersona3",
+        "id_autonomo": "peluqueria112",
+        "nombre": "joel",
         "telefono": fake.phone_number(),
-        "fecha_reserva": fake.date_between(start_date="today", end_date="+30d").strftime("%Y-%m-%d"),
-        "hora_reserva": fake.time(pattern="%H:%M:%S"),
-        "status": random.choice(["pendiente", "confirmada", "cancelada", "realizada"]),
+        "fecha_reserva": "2023-10-10",
+        "hora_reserva": "21:00",
+        "status": random.choice(["registrado"]),
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
 
-for _ in range(10):
+for _ in range(15):
     reserva = generar_reserva()
     data_json = json.dumps(reserva).encode("utf-8")
     publisher.publish(topic_path, data=data_json)

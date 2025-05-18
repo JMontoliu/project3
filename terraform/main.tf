@@ -8,6 +8,7 @@ module "bbdd" {
   postgres_db_name     = var.db_name
   postgres_user        = var.db_user  
   postgres_password    = var.db_password
+  
 
   tables = [
     {
@@ -17,19 +18,19 @@ module "bbdd" {
   ]
 }
 
-module "api" {
-  source                 = "./modules/api"
-  project_id             = var.project_id
-  region                 = var.region
-  repository_name        = "docker-repo"
-  image_name             = "customer-api"
-  cloud_run_service_name = "customer-api"
-  db_host                = "127.0.0.1" 
-  port                   = "5432"
-  db_name                = var.db_name
-  db_user                = var.db_user
-  db_password            = var.db_password
-}
+# module "api" {
+#   source                 = "./modules/api"
+#   project_id             = var.project_id
+#   region                 = var.region
+#   repository_name        = "docker-repo"
+#   image_name             = "customer-api"
+#   cloud_run_service_name = "customer-api"
+#   db_host                = "127.0.0.1" 
+#   port                   = "5432"
+#   db_name                = var.db_name
+#   db_user                = var.db_user
+#   db_password            = var.db_password
+# }
 
 # module "injectors" {
 #   source          = "./modules/injectors"
@@ -51,13 +52,13 @@ module "cloud_function" {
 
   env_variables = {
     # BigQuery
-    PROJECT_ID = var.project_id
-    DATASET    = var.bq_dataset
-    TABLES =  "customers"
+    # PROJECT_ID = var.project_id
+    # DATASET    = var.bq_dataset
+    # TABLES =  "customers"
 
 
     # PostgreSQL
-    PG_HOST     = var.db_host
+    PG_HOST     = module.bbdd.sql_host
     PG_PORT     = var.port 
     PG_USER     = var.db_user
     PG_PASSWORD = var.postgres_password
@@ -66,4 +67,5 @@ module "cloud_function" {
     # Logging
     LOG_LEVEL   = "INFO"
   }
+  depends_on = [ module.bbdd ]
 }

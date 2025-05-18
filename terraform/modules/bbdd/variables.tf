@@ -16,7 +16,6 @@ variable "tables" {
   description = "Lista de tablas BigQuery: nombre y archivo de esquema JSON"
 }
 
-
 variable "region" {
   type        = string
   description = "Región para desplegar los recursos"

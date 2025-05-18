@@ -16,7 +16,7 @@ variable tf_state_bucket_name {
 
 variable db_name {
   type        = string
-  default     = "costumers"
+  default     = "customers"
   description = "Name of the database"
 }
 
@@ -80,12 +80,6 @@ variable "cloud_run_service_name" {
 
 }
 
-variable "db_host" {
-  description = "Host de la base de datos (IP o conexión Cloud SQL Proxy)"
-  type        = string
-
-}
-
 variable "port" {
   description = "Puerto de conexión a la base de datos"
   type        = string
@@ -108,15 +102,15 @@ variable "postgres_tier" {
   description = "Tier para la instancia de Cloud SQL"
   default     = "db-f1-micro"
 }
-variable "service" {
-  type        = string
-  description = "Nombre del servicio Cloud Run al que enviarás el POST"
-}
+# variable "service" {
+#   type        = string
+#   description = "Nombre del servicio Cloud Run al que enviarás el POST"
+# }
 
-variable "api_url" {
-  type        = string
-  description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
-}
+# variable "api_url" {
+#   type        = string
+#   description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
+# }
 
 variable "entry_point" {
   type        = string
