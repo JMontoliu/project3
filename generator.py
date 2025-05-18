@@ -16,13 +16,13 @@ topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
 def generar_reserva():
     return {
-        "id_persona": "idpersona3",
+        "id_persona": "idpersona1",
         "id_autonomo": "peluqueria112",
         "nombre": "joel",
         "telefono": fake.phone_number(),
         "fecha_reserva": "2023-10-10",
         "hora_reserva": "21:00",
-        "status": random.choice(["registrado"]),
+        "status": random.choice(["cancelado"]),
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 

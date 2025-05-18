@@ -68,7 +68,6 @@ def register_client(conn, data):
     try:
         cursor = conn.cursor()
         
-        # Verificar si el cliente ya existe
         check_query = """
         SELECT COUNT(*) FROM clients
         WHERE id_persona = %s
@@ -95,7 +94,6 @@ def register_client(conn, data):
         logging.error(f"Error registering client: {e}")
         raise
 
-
 def insert_postgres(data):
     try:
         conn = get_postgres_connection()
@@ -119,12 +117,53 @@ def insert_postgres(data):
             ))
             count = cursor.fetchone()[0]
             
-            # Si ya existe una reserva en esa fecha y hora, salir sin insertar
             if count > 0:
                 logging.info(f"Ya existe una reserva para el autónomo {data['id_autonomo']} en la fecha {data['fecha_reserva']} a las {data['hora_reserva']}. No se insertará.")
                 conn.close()
                 return
+        
+        elif data["status"] == "cancelado":
+            check_query = """
+            SELECT COUNT(*) FROM customers 
+            WHERE id_persona = %s
+            AND id_autonomo = %s 
+            AND fecha_reserva = %s 
+            AND hora_reserva = %s 
+            AND status != 'cancelado'
+            """
+            cursor.execute(check_query, (
+                data["id_persona"],
+                data["id_autonomo"],
+                data["fecha_reserva"],
+                data["hora_reserva"]
+            ))
+            exists = cursor.fetchone()[0] > 0
             
+            if exists:
+                update_query = """
+                UPDATE customers 
+                SET status = 'cancelado', created_at = %s
+                WHERE id_persona = %s
+                AND id_autonomo = %s 
+                AND fecha_reserva = %s 
+                AND hora_reserva = %s
+                """
+                cursor.execute(update_query, (
+                    data["created_at"],
+                    data["id_persona"],
+                    data["id_autonomo"],
+                    data["fecha_reserva"],
+                    data["hora_reserva"]
+                ))
+                conn.commit()
+                logging.info(f"Reserva cancelada para persona {data['id_persona']} con autónomo {data['id_autonomo']} en fecha {data['fecha_reserva']} a las {data['hora_reserva']}.")
+                cursor.close()
+                conn.close()
+                return
+            else:
+                logging.info(f"La persona {data['id_persona']} no tiene una reserva activa con el autónomo {data['id_autonomo']} en fecha {data['fecha_reserva']} a las {data['hora_reserva']}. No se procesará la cancelación.")
+                conn.close()
+                return
 
         insert_query = """
         INSERT INTO customers (id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
