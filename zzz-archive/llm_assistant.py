@@ -5,7 +5,7 @@ from langchain.agents import create_tool_calling_agent
 from langchain_core.runnables import RunnableLambda
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage
-from assistant_tools import registrar_cita
+from chatbot.app.tools.assistant_tools import registrar_cita
 
 class ChatAgentFactory:
     """Creates and holds a shared agent with its graph."""
