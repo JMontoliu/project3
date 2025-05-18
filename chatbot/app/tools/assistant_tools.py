@@ -5,12 +5,16 @@ import random
 import pytz # Para zonas horarias
 import os   # Para acceder a variables de entorno
 
+relative_path_products = "app/data/products.txt" 
 
 @tool
 def get_current_datetime_in_spain() -> str:
     """
-    Devuelve la fecha y hora actual en España (Madrid/Península).
-    Útil para saber el momento exacto de la conversación o para planificar respecto al ahora.
+    Devuelve la fecha y hora actual exacta en España (zona horaria de Madrid/Península).
+    Esencial para contextualizar conversaciones, verificar si una fecha propuesta es en el pasado,
+    o para cualquier planificación que dependa del momento presente.
+    No requiere argumentos.
+    Ejemplo de salida: 'La fecha y hora actual en España es: Sábado, 18 de mayo de 2024, 15:30:00 CEST+0200'.
     """
     try:
         timezone_spain = pytz.timezone('Europe/Madrid')
@@ -28,12 +32,14 @@ def registrar_cita(
     hora_reserva: str
 ) -> str:
     """
-    Registra una cita con los siguientes datos:
-    - nombre
-    - telefono
-    - fecha_reserva
-    - hora_reserva
-    (id_persona aleatorio, created_at actual, status=False)
+    Registra una NUEVA cita en el sistema para un cliente. Esta acción guarda la reserva.
+    Se DEBEN proporcionar TODOS los siguientes datos como argumentos:
+    - nombre (str): Nombre completo del cliente.
+    - telefono (str): Número de teléfono de contacto del cliente.
+    - fecha_reserva (str): Fecha deseada para la cita en formato YYYY-MM-DD.
+    - hora_reserva (str): Hora deseada para la cita en formato HH:MM (24h).
+    - tipo_sesion (str): El tipo específico de sesión fotográfica que se va a reservar (ej. 'Sesión Newborn Clásica', 'Sesión Embarazo Exterior', 'Pack Dulce Espera').
+    Devuelve un mensaje de confirmación con un ID de cita si tiene éxito, o un mensaje de error si el registro falla.
     """
     url = "https://customer-api-196041114036.europe-west1.run.app/publish"
 
@@ -67,13 +73,15 @@ def modificar_reserva(
     nueva_hora: str
 ) -> str:
     """
-    Modifica una reserva existente.
-    - nombre
-    - telefono
-    - nueva_fecha
-    - nueva_hora
+    Modifica los detalles de una cita YA EXISTENTE en el sistema para un cliente.
+    Se necesita identificar la cita original (usando nombre y teléfono del cliente) y los nuevos detalles.
+    Argumentos requeridos:
+    - nombre (str): Nombre completo del cliente de la cita original.
+    - telefono (str): Número de teléfono del cliente de la cita original.
+    - nueva_fecha (str): Nueva fecha deseada para la cita en formato YYYY-MM-DD.
+    - nueva_hora (str): Nueva hora deseada para la cita en formato HH:MM (24h).
+    Devuelve un mensaje de confirmación del cambio o un error si no se pudo modificar.
     """
-    """Modifica una reserva existente con nueva_fecha y nueva_hora."""
 
     return f"Simulación: Reserva para {nombre} modificada a {nueva_fecha} {nueva_hora}."
 
@@ -85,9 +93,12 @@ def cancelar_reserva(
     telefono: str
 ) -> str:
     """
-    Cancela una reserva existente.
-    - nombre
-    - telefono
+    Cancela una cita YA EXISTENTE en el sistema para un cliente.
+    Se necesita identificar la cita a cancelar usando el nombre y teléfono del cliente.
+    Argumentos requeridos:
+    - nombre (str): Nombre completo del cliente de la cita a cancelar.
+    - telefono (str): Número de teléfono del cliente de la cita a cancelar.
+    Devuelve un mensaje de confirmación de la cancelación o un error si no se pudo cancelar.
     """
     return f"Simulación: Reserva para {nombre} cancelada."
 
@@ -98,8 +109,11 @@ def consultar_horarios_disponibles(
     fecha: str
 ) -> str:
     """
-    Consulta los horarios disponibles para una fecha dada.
-    - fecha
+    Consulta y devuelve los horarios de citas que están libres para una fecha específica.
+    Útil cuando un cliente pregunta '¿qué horas tienes libres el día X?' o '¿hay hueco para el YYYY-MM-DD?'.
+    Argumentos requeridos:
+    - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
+    Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
     """
     if "hoy" in fecha.lower() or datetime.now().strftime("%Y-%m-%d") in fecha:
         return "Simulación: Para hoy, disponibles a las 15:00, 16:00."
@@ -114,19 +128,23 @@ def confirmar_reserva(
     telefono: str
 ) -> str:
     """
-    Confirma una reserva pendiente.
-    - nombre
-    - telefono
+    Consulta y devuelve los horarios de citas que están libres para una fecha específica.
+    Útil cuando un cliente pregunta '¿qué horas tienes libres el día X?' o '¿hay hueco para el YYYY-MM-DD?'.
+    Argumentos requeridos:
+    - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
+    Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
     """
     return f"Simulación: Reserva para {nombre} confirmada."
 
 @tool
 def get_weather_forecast_simple(location: str = "Valencia,Spain") -> str:
     """
-    Obtiene el pronóstico del tiempo actual y para los próximos 1-2 días para una ubicación.
-    Por defecto, consulta el tiempo en Valencia, España.
-    El formato de 'location' puede ser Ciudad, 'lat,lon', o código postal.
-    """
+tiene el pronóstico del tiempo actual y para los próximos 1-2 días para una ubicación específica.
+    Es muy útil para planificar sesiones fotográficas en exterior.
+    Si el usuario no especifica una ubicación, por defecto se usará 'Valencia,Spain'.
+    Argumentos:
+    - location (str, opcional): La ubicación para el pronóstico. Puede ser 'Ciudad', 'Ciudad,CodigoPais' (ej. 'Madrid,ES'), 'lat,lon', o código postal. Por defecto es 'Valencia,Spain'.
+    Devuelve un informe del tiempo. Si el pronóstico incluye lluvia o condiciones adversas, menciónalo.    """
     api_key = os.getenv("WEATHERAPI_API_KEY")
     if not api_key:
         return "Error: La API key para el servicio de WeatherAPI no está configurada."
@@ -192,6 +210,26 @@ def get_weather_forecast_simple(location: str = "Valencia,Spain") -> str:
     except Exception as e:
         print(f"Error inesperado en WeatherAPI para {location}: {e}")
         return f"Lo siento, ocurrió un error inesperado al obtener el tiempo para {location}."
+    
+@tool
+def get_all_product_info_text() -> str:
+    """
+    Recupera la descripción COMPLETA de TODOS los productos y servicios fotográficos ofrecidos por Sarashot.
+    DEBE usarse cuando el usuario haga preguntas generales sobre qué servicios hay, qué tipos de sesiones se ofrecen,
+    o si necesita una visión global antes de preguntar por un servicio específico.
+    Esta herramienta devuelve un ÚNICO string largo con toda la información. No requiere argumentos.
+    El LLM que llama a esta herramienta es responsable de leer y extraer la información pertinente de este texto para responder al usuario.
+
+    """
+    print(f"Tool: get_all_product_info_text (ultra-simple) - Leyendo desde: {relative_path_products}")
+    
+    # Leer directamente el archivo. Si no existe o hay problemas, esto fallará con una excepción.
+    with open(relative_path_products, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    print(f"Tool: get_all_product_info_text - Contenido recuperado (primeros 300 chars):\n{content[:300]}...")
+    return content
+ 
 
 all_assistant_tools = [
     registrar_cita, 
@@ -200,6 +238,7 @@ all_assistant_tools = [
     consultar_horarios_disponibles, 
     confirmar_reserva,
     get_current_datetime_in_spain,
-    get_weather_forecast_simple
+    get_weather_forecast_simple,
+    get_all_product_info_text
 ]
 
