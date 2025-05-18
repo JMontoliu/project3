@@ -57,9 +57,31 @@ def insert_postgres(data):
         conn = get_postgres_connection()
         cursor = conn.cursor()
 
+        if data["status"] == "registrado":
+            check_query = """
+            SELECT COUNT(*) FROM customers 
+            WHERE id_autonomo = %s 
+            AND fecha_reserva = %s 
+            AND hora_reserva = %s 
+            AND status != 'cancelado'
+            """
+            cursor.execute(check_query, (
+                data["id_autonomo"],
+                data["fecha_reserva"],
+                data["hora_reserva"]
+            ))
+            count = cursor.fetchone()[0]
+            
+            # Si ya existe una reserva en esa fecha y hora, salir sin insertar
+            if count > 0:
+                logging.info(f"Ya existe una reserva para el autónomo {data['id_autonomo']} en la fecha {data['fecha_reserva']} a las {data['hora_reserva']}. No se insertará.")
+                conn.close()
+                return
+            
+
         insert_query = """
         INSERT INTO customers (id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (id_persona) DO UPDATE SET
             id_autonomo = EXCLUDED.id_autonomo,
             nombre = EXCLUDED.nombre,
