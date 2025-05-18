@@ -32,6 +32,14 @@ resource "google_sql_database_instance" "postgres" {
   settings {
     tier = var.postgres_tier
 
+    ip_configuration {
+      ipv4_enabled = true
+      authorized_networks {
+        name  = "public-access"
+        value = "0.0.0.0/0"
+      }
+    }
+
   }
   
   deletion_protection = false

@@ -56,4 +56,8 @@ resource "google_cloudfunctions2_function" "function" {
   }
 
   depends_on = [google_pubsub_topic.default]
+
+  timeouts {
+    create = "15m"
+  }
 }

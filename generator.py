@@ -17,6 +17,7 @@ topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 def generar_reserva():
     return {
         "id_persona": str(uuid.uuid4()),
+        "id_autonomo": "peluqueria112",
         "nombre": fake.name(),
         "telefono": fake.phone_number(),
         "fecha_reserva": fake.date_between(start_date="today", end_date="+30d").strftime("%Y-%m-%d"),
