@@ -16,7 +16,8 @@ topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
 def generar_reserva():
     return {
-        "id_persona": str(uuid.uuid4()),
+        "id_reserva": "reserva1",
+        "id_persona": "persona2",
         "id_autonomo": "peluqueria112",
         "nombre": "antonio",
         "telefono": fake.phone_number(),
@@ -27,7 +28,7 @@ def generar_reserva():
     }
 
 
-for _ in range(10):
+for _ in range(15):
     reserva = generar_reserva()
     data_json = json.dumps(reserva).encode("utf-8")
     publisher.publish(topic_path, data=data_json)
