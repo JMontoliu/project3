@@ -6,15 +6,14 @@ import logging
 import json
 import psycopg2
 from google.cloud import bigquery
+import uuid
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-# Configuración basada en las variables de Terraform
 PROJECT_ID = os.getenv("PROJECT_ID", "dataproject03")
 REGION = os.getenv("REGION", "europe-west1")
 BQ_DATASET = os.getenv("BQ_DATASET", "chatbot_dataset")
 
-# Configuración de PostgreSQL
 PG_DATABASE = os.getenv("PG_DATABASE", "reservas_db")
 PG_USER = os.getenv("PG_USER", "postgres_user")
 PG_PASSWORD = os.getenv("PG_PASSWORD", "password")
@@ -36,9 +35,9 @@ def create_tables_if_not_exist(conn):
     try:
         cursor = conn.cursor()
 
-        # Modificamos la tabla customers para usar clave primaria compuesta
         create_customers_query = """
         CREATE TABLE IF NOT EXISTS customers (
+            id_ticket VARCHAR(36) NOT NULL,
             id_persona VARCHAR(255) NOT NULL,
             id_autonomo VARCHAR(255) NOT NULL,
             nombre VARCHAR(255) NOT NULL,
@@ -47,7 +46,8 @@ def create_tables_if_not_exist(conn):
             hora_reserva TIME NOT NULL,
             status VARCHAR(255) NOT NULL,
             created_at TIMESTAMP NOT NULL,
-            PRIMARY KEY (id_persona, id_autonomo, fecha_reserva, hora_reserva)
+            PRIMARY KEY (id_ticket),
+            UNIQUE (id_persona, id_autonomo, fecha_reserva, hora_reserva)
         );
         """
         cursor.execute(create_customers_query)
@@ -129,7 +129,7 @@ def insert_postgres(data):
         
         elif data["status"] == "cancelado":
             check_query = """
-            SELECT COUNT(*) FROM customers 
+            SELECT id_ticket FROM customers 
             WHERE id_persona = %s
             AND id_autonomo = %s 
             AND fecha_reserva = %s 
@@ -142,26 +142,24 @@ def insert_postgres(data):
                 data["fecha_reserva"],
                 data["hora_reserva"]
             ))
-            exists = cursor.fetchone()[0] > 0
             
-            if exists:
+            result = cursor.fetchone()
+            if result:
+                id_ticket = result[0]
                 update_query = """
                 UPDATE customers 
                 SET status = 'cancelado', created_at = %s
-                WHERE id_persona = %s
-                AND id_autonomo = %s 
-                AND fecha_reserva = %s 
-                AND hora_reserva = %s
+                WHERE id_ticket = %s
                 """
                 cursor.execute(update_query, (
                     data["created_at"],
-                    data["id_persona"],
-                    data["id_autonomo"],
-                    data["fecha_reserva"],
-                    data["hora_reserva"]
+                    id_ticket
                 ))
                 conn.commit()
-                logging.info(f"Reserva cancelada para persona {data['id_persona']} con autónomo {data['id_autonomo']} en fecha {data['fecha_reserva']} a las {data['hora_reserva']}.")
+                logging.info(f"Reserva cancelada para persona {data['id_persona']} con autónomo {data['id_autonomo']} en fecha {data['fecha_reserva']} a las {data['hora_reserva']}. Ticket: {id_ticket}")
+                
+                data["id_ticket"] = id_ticket
+                
                 cursor.close()
                 conn.close()
                 return
@@ -170,10 +168,11 @@ def insert_postgres(data):
                 conn.close()
                 return
 
-        # Modificada para usar clave primaria compuesta
+        id_ticket = str(uuid.uuid4())
+        
         insert_query = """
-        INSERT INTO customers (id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO customers (id_ticket, id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (id_persona, id_autonomo, fecha_reserva, hora_reserva) DO UPDATE SET
             nombre = EXCLUDED.nombre,
             telefono = EXCLUDED.telefono,
@@ -182,6 +181,7 @@ def insert_postgres(data):
         """
 
         cursor.execute(insert_query, (
+            id_ticket,
             data["id_persona"],
             data["id_autonomo"],
             data["nombre"],
@@ -195,34 +195,31 @@ def insert_postgres(data):
         conn.commit()
         cursor.close()
         conn.close()
-        logging.info("Data inserted into PostgreSQL.")
+        logging.info(f"Data inserted into PostgreSQL with ticket ID: {id_ticket}")
+        
+        data["id_ticket"] = id_ticket
+        
     except Exception as e:
         logging.error(f"Error inserting data PostgreSQL: {e}")
         raise
 
-# BigQuery functions
 def insert_to_bigquery(data):
     try:
         client = bigquery.Client(project=PROJECT_ID)
         
-        # Insertar en la tabla clients de BigQuery
         if "id_persona" in data and "nombre" in data and "telefono" in data:
             insert_client_to_bigquery(client, data)
         
-        # Insertar en la tabla reservas de BigQuery (TODOS los registros, incluyendo cancelaciones)
         if "id_persona" in data and "id_autonomo" in data:
             insert_reservation_to_bigquery(client, data)
             
     except Exception as e:
         logging.error(f"Error al insertar en BigQuery: {e}")
-        # No lanzamos la excepción para que el proceso continúe
 
 def insert_client_to_bigquery(client, data):
     try:
-        # Definimos el ID de la tabla de clientes
         table_id = f"{PROJECT_ID}.{BQ_DATASET}.clients"
         
-        # Verificamos si el cliente ya existe en BigQuery
         query = f"""
         SELECT COUNT(*) as count
         FROM `{PROJECT_ID}.{BQ_DATASET}.clients`
@@ -232,12 +229,10 @@ def insert_client_to_bigquery(client, data):
         query_job = client.query(query)
         results = list(query_job)
         
-        # Si el cliente ya existe, no lo insertamos de nuevo
         if results and results[0]['count'] > 0:
             logging.info(f"Cliente ya existe en BigQuery, no se insertará nuevamente: {data['id_persona']}")
             return
         
-        # Preparamos los datos para insertar
         rows_to_insert = [{
             "id_persona": data["id_persona"],
             "nombre": data["nombre"],
@@ -245,7 +240,6 @@ def insert_client_to_bigquery(client, data):
             "created_at": data["created_at"]
         }]
         
-        # Insertamos los datos
         errors = client.insert_rows_json(table_id, rows_to_insert)
         if errors == []:
             logging.info(f"Cliente insertado en BigQuery: {data['id_persona']}")
@@ -256,37 +250,65 @@ def insert_client_to_bigquery(client, data):
 
 def insert_reservation_to_bigquery(client, data):
     try:
-        # Verificamos que tengamos todos los campos necesarios
         required_fields = ["id_persona", "id_autonomo", "nombre", "telefono", 
                            "fecha_reserva", "hora_reserva", "status", "created_at"]
         if not all(field in data for field in required_fields):
             logging.error("Faltan campos requeridos para insertar en la tabla de reservas")
             return
         
-        # Definimos el ID de la tabla de reservas
         table_id = f"{PROJECT_ID}.{BQ_DATASET}.reservas"
         
-        # Formatear la hora correctamente para BigQuery (añadir segundos si no están presentes)
         hora_reserva = data["hora_reserva"]
         if ":" in hora_reserva and len(hora_reserva.split(":")) == 2:
-            hora_reserva = f"{hora_reserva}:00"  # Añade los segundos si solo tiene HH:MM
+            hora_reserva = f"{hora_reserva}:00"
         
-        # Preparamos los datos para insertar - SIEMPRE insertamos TODOS los registros para análisis
-        rows_to_insert = [{
+        if "id_ticket" not in data:
+            data["id_ticket"] = str(uuid.uuid4())
+            logging.warning(f"Generando nuevo id_ticket para BigQuery: {data['id_ticket']}")
+        
+        if data["status"] == "cancelado":
+            try:
+                search_query = f"""
+                SELECT COUNT(*) as count 
+                FROM `{PROJECT_ID}.{BQ_DATASET}.reservas`
+                WHERE id_ticket = '{data["id_ticket"]}'
+                """
+                
+                query_job = client.query(search_query)
+                results = list(query_job)
+                
+                if results and results[0]['count'] > 0:
+                    update_query = f"""
+                    UPDATE `{PROJECT_ID}.{BQ_DATASET}.reservas`
+                    SET status = 'cancelado', created_at = '{data["created_at"]}'
+                    WHERE id_ticket = '{data["id_ticket"]}'
+                    """
+                    
+                    query_job = client.query(update_query)
+                    query_job.result()
+                    
+                    logging.info(f"Reserva actualizada a 'cancelado' en BigQuery. Ticket: {data['id_ticket']}")
+                    return
+            except Exception as e:
+                logging.error(f"Error al intentar actualizar reserva cancelada: {e}")
+        
+        row_data = {
+            "id_ticket": data["id_ticket"],
             "id_persona": data["id_persona"],
             "id_autonomo": data["id_autonomo"],
             "nombre": data["nombre"],
             "telefono": data["telefono"],
             "fecha_reserva": data["fecha_reserva"],
-            "hora_reserva": hora_reserva,  # Usamos la hora formateada
+            "hora_reserva": hora_reserva,
             "status": data["status"],
             "created_at": data["created_at"]
-        }]
+        }
         
-        # Insertamos los datos
+        rows_to_insert = [row_data]
+        
         errors = client.insert_rows_json(table_id, rows_to_insert)
         if errors == []:
-            logging.info(f"Reserva insertada en BigQuery: {data['id_persona']} - {data['fecha_reserva']} {hora_reserva} - Status: {data['status']}")
+            logging.info(f"Reserva insertada en BigQuery: {data['id_persona']} - {data['fecha_reserva']} {hora_reserva} - Status: {data['status']} - Ticket: {data['id_ticket']}")
         else:
             logging.error(f"Errores al insertar en BigQuery (reservas): {errors}")
     except Exception as e:
@@ -295,17 +317,12 @@ def insert_reservation_to_bigquery(client, data):
 @functions_framework.cloud_event
 def process_pubsub_message(cloud_event):
     try:
-        # Decodificar el mensaje de Pub/Sub
         data = json.loads(base64.b64decode(cloud_event.data["message"]["data"]).decode('utf-8'))
         
-        # Añadir marca de tiempo si no existe
         if "created_at" not in data:
             data["created_at"] = datetime.now().isoformat()
         
-        # Insertar en PostgreSQL
         insert_postgres(data)
-        
-        # Insertar en BigQuery
         insert_to_bigquery(data)
         
         logging.info("Procesamiento completado con éxito")
