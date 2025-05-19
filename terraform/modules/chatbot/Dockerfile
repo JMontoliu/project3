@@ -16,10 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app ./app
 
 # Exponer el puerto en el que FastAPI/Uvicorn escuchará
-EXPOSE 8000
+EXPOSE 8020
 
 # Comando para ejecutar la aplicación FastAPI con Uvicorn
-# Escucha en todas las interfaces (0.0.0.0) en el puerto 8000
+# Escucha en todas las interfaces (0.0.0.0) en el puerto 8020
 # --reload es para desarrollo, permite que uvicorn se reinicie si cambias el código.
 # Quítalo para producción.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8020", "--reload"]

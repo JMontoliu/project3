@@ -1,7 +1,7 @@
 services:
   telegram_gateway:
     build:
-      context: ./telegram # Ruta a la carpeta con el Dockerfile de telegram_gateway
+      context: ./terraform/modules/chatbot/telegram # Ruta a la carpeta con el Dockerfile de telegram_gateway
       dockerfile: Dockerfile
     container_name: telegram_gateway_container
     env_file:
@@ -14,13 +14,13 @@ services:
 
   chatbot_core:
     build:
-      context: ./chatbot # Ruta a la carpeta con el Dockerfile de chatbot_core
+      context: ./terraform/modules/chatbot/chatbot # Ruta a la carpeta con el Dockerfile de chatbot_core
       dockerfile: Dockerfile
     container_name: chatbot_core_container
     env_file:
       - .env 
     ports:
-      - "8000:8000" # Expondremos el puerto 8000 del contenedor al 8000 del host
+      - "8020:8020" # Expondremos el puerto 8020 del contenedor al 8020 del host
     volumes:
       - ./chatbot/app:/usr/src/app/app # Monta el código para desarrollo
     environment:

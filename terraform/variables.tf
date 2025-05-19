@@ -68,7 +68,19 @@ variable "repository_name" {
 
 }
 
+variable "repository_name2" {
+  description = "Nombre del repositorio en Artifact Registry"
+  type        = string
+
+}
+
 variable "image_name" {
+  description = "Nombre de la imagen Docker"
+  type        = string
+
+}
+
+variable "image_name2" {
   description = "Nombre de la imagen Docker"
   type        = string
 
@@ -78,6 +90,30 @@ variable "cloud_run_service_name" {
   description = "Nombre del servicio en Cloud Run"
   type        = string
 
+}
+
+variable "cloud_run_service_name2" {
+  description = "Nombre del servicio en Cloud Run"
+  type        = string
+
+}
+
+variable "repository_name3" {
+  description = "Nombre del repositorio en Artifact Registry"
+  type        = string
+  
+}
+
+variable "image_name3" {
+  description = "Nombre de la imagen Docker"
+  type        = string
+  
+}
+
+variable "cloud_run_service_name3" {
+  description = "Nombre del servicio en Cloud Run"
+  type        = string
+  
 }
 
 variable "port" {
@@ -107,11 +143,6 @@ variable "postgres_tier" {
 #   description = "Nombre del servicio Cloud Run al que enviarás el POST"
 # }
 
-# variable "api_url" {
-#   type        = string
-#   description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
-# }
-
 variable "entry_point" {
   type        = string
   description = "Nombre de la función que se ejecuta al recibir un mensaje"
@@ -123,4 +154,19 @@ variable "name" {
   type        = string
   description = "Nombre de la función"
   default     = "insert_data_function"
+}
+
+variable "google_api_key" {
+  description = "Clave de API de Google"
+  type        = string
+}
+
+variable "api_weather_key" {
+  description = "Clave de API de WeatherAPI"
+  type        = string
+}
+
+variable "telegram_api_key" {
+  description = "URL de la API"
+  type        = string
 }

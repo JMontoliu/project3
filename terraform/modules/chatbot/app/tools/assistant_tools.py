@@ -41,7 +41,11 @@ def registrar_cita(
     - tipo_sesion (str): El tipo específico de sesión fotográfica que se va a reservar (ej. 'Sesión Newborn Clásica', 'Sesión Embarazo Exterior', 'Pack Dulce Espera').
     Devuelve un mensaje de confirmación con un ID de cita si tiene éxito, o un mensaje de error si el registro falla.
     """
-    url = "https://customer-api-196041114036.europe-west1.run.app/publish"
+    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    if not url:
+        return "Error: CUSTOMER_API_URL no está configurada."
+    if not url.endswith("/publish"):
+        url = url + "/publish"
 
     payload = {
         "data": {
