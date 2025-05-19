@@ -1,7 +1,7 @@
 resource "google_artifact_registry_repository" "repo" {
   project       = var.project_id
   location      = var.region
-  repository_id = var.repository_name
+  repository_id = var.repository_name3
   format        = "DOCKER"
 }
 
@@ -16,7 +16,7 @@ resource "null_resource" "docker_auth" {
 
 # Construcción de la imagen con Docker y push a Artifact Registry
 locals {
-  image_url = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository_name}/${var.image_name}:latest"
+  image_url = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository_name3}/${var.image_name3}:latest"
 }
 
 resource "null_resource" "build_push_image" {
@@ -32,53 +32,40 @@ resource "null_resource" "build_push_image" {
 
 
 
-resource "google_cloud_run_v2_service" "service" {
-  name     = var.cloud_run_service_name
-  location = var.region
-  project  = var.project_id
+resource "google_cloud_run_v2_service" "telegram" {
+  name                = var.cloud_run_service_name3
+  location            = var.region
+  project             = var.project_id
   deletion_protection = false
 
   template {
-      containers {
-        image = "europe-west1-docker.pkg.dev/${var.project_id}/${var.repository_name}/${var.image_name}:latest"
+    containers {
+      image = "europe-west1-docker.pkg.dev/${var.project_id}/${var.repository_name3}/${var.image_name3}:latest"
 
-      env {
-        name  = "DB_HOST"
-        value = var.db_host
+    env {
+        name  = "URL_CHATBOT"
+        value = var.url_chatbot
       }
-
+    
       env {
-        name  = "DB_PORT"
-        value = var.port
-      }
-
-      env {
-        name  = "DB_NAME"
-        value = var.db_name
-      }
-
-      env {
-        name  = "DB_USER"
-        value = var.db_user
-      }
-
-      env {
-        name  = "DB_PASSWORD"
-        value = var.db_password
+        name  = "TELEGRAM_API_KEY"
+        value = var.telegram_api_key
       }
 
       ports {
-        container_port = 8000
-      }
+        container_port = 8030
       }
     }
-  
+  }
+
   traffic {
-    type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100
   }
 
-  depends_on = [ null_resource.build_push_image ]
+  depends_on = [
+    null_resource.build_push_image
+  ]
 }
 
 
@@ -86,7 +73,7 @@ resource "google_cloud_run_v2_service" "service" {
 resource "google_cloud_run_service_iam_member" "invoker" {
   project  = var.project_id
   location = var.region
-  service  = google_cloud_run_v2_service.service.name
+  service  = google_cloud_run_v2_service.telegram.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
