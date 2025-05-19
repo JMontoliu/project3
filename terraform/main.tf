@@ -12,9 +12,13 @@ module "bbdd" {
 
   tables = [
     {
-      name   = "customers"
+      name   = "reservas"
       schema = "main.json"
-    }
+    },
+    {
+    name   = "clients"
+    schema = "clients.json"
+  }
   ]
 }
 
@@ -52,9 +56,9 @@ module "cloud_function" {
 
   env_variables = {
     # BigQuery
-    # PROJECT_ID = var.project_id
-    # DATASET    = var.bq_dataset
-    # TABLES =  "customers"
+    PROJECT_ID = var.project_id
+    DATASET    = var.bq_dataset
+    REGION   = var.region
 
 
     # PostgreSQL
