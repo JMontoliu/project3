@@ -1,5 +1,7 @@
 [
+  { "name": "id_ticket",      "type": "STRING",    "mode": "REQUIRED" },
   { "name": "id_persona",     "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "id_autonomo",    "type": "STRING",    "mode": "REQUIRED" },
   { "name": "nombre",         "type": "STRING",    "mode": "REQUIRED" },
   { "name": "telefono",       "type": "STRING",    "mode": "REQUIRED" },
   { "name": "fecha_reserva",  "type": "DATE",      "mode": "REQUIRED" },
