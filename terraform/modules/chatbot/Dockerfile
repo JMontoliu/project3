@@ -19,7 +19,7 @@ COPY ./app ./app
 EXPOSE 8020
 
 # Comando para ejecutar la aplicación FastAPI con Uvicorn
-# Escucha en todas las interfaces (0.0.0.0) en el puerto 8020
+# Escucha en todas las interfaces (0.0.0.0) en el puerto 8000
 # --reload es para desarrollo, permite que uvicorn se reinicie si cambias el código.
 # Quítalo para producción.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8020", "--reload"]

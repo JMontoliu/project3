@@ -44,11 +44,11 @@ resource "google_cloud_run_v2_service" "chatbot" {
 
       env {
         name  = "CUSTOMER_API_URL"
-        value = var.url_api
+        value = ""
       }
 
       env {
-        name  = "GOOGLE_API_KEY"
+        name  = "OPENAI_API_KEY"
         value = var.google_api_key
       }
 

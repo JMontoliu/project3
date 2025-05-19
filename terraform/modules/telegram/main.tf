@@ -44,7 +44,7 @@ resource "google_cloud_run_v2_service" "telegram" {
 
     env {
         name  = "URL_CHATBOT"
-        value = var.url_chatbot
+        value = ""
       }
     
       env {
@@ -53,7 +53,7 @@ resource "google_cloud_run_v2_service" "telegram" {
       }
 
       ports {
-        container_port = 8030
+        container_port = 8050
       }
     }
   }

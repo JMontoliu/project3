@@ -63,19 +63,23 @@ module "telegram" {
   url_chatbot                = module.chatbot.url_chatbot
   telegram_api_key           = var.telegram_api_key
 
-  depends_on = [ module.chatbot]
+  depends_on = [ module.chatbot ]
 }
 
 
-# module "injectors" {
-#   source          = "./modules/injectors"
-#   project_id      = var.project_id
-#   region          = var.region
-#   api_url         = module.api.api_url
-#   chatbot         = module.chatbot.env_vars_api
 
-#   depends_on = [ module.api, module.bbdd, module.chatbot ]
-# }
+module "injectors" {
+  source          = "./modules/injectors"
+  project_id      = var.project_id
+  region          = var.region
+  api_url         = module.api.api_url
+  chatbot         = module.chatbot.env_vars_api
+  chatbot_url     = module.chatbot.url_chatbot
+  telegram        = module.telegram.telegram_name
+
+  depends_on = [ module.api, module.bbdd, module.chatbot, module.telegram ]
+
+}
 
 module "cloud_function" {
   name        = "cloud_function"

@@ -13,8 +13,19 @@ variable "api_url" {
   description = "URL base del endpoint GET que usará el servicio POST como DATA_API_URL"
 }
 
+
 variable "chatbot" {
   type        = string
   description = "Nombre del servicio Cloud Run para el chatbot"
+}
 
+variable "chatbot_url" {
+  type        = string
+  description = "Nombre del servicio Cloud Run para el chatbot"
+}
+
+variable "telegram" {
+  type        = string
+  description = "Nombre del servicio Cloud Run para el bot de Telegram"
+  
 }
