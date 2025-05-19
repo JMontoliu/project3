@@ -14,7 +14,7 @@ PROJECT_ID = os.getenv("PROJECT_ID", "dataproject03")
 REGION = os.getenv("REGION", "europe-west1")
 BQ_DATASET = os.getenv("BQ_DATASET", "chatbot_dataset")
 
-# Configuración de PostgreSQL
+# Configuración de PostgreSQL - Si eventualmente necesitas configurarlo específicamente
 PG_DATABASE = os.getenv("PG_DATABASE", "reservas_db")
 PG_USER = os.getenv("PG_USER", "postgres_user")
 PG_PASSWORD = os.getenv("PG_PASSWORD", "password")
@@ -36,30 +36,29 @@ def create_tables_if_not_exist(conn):
     try:
         cursor = conn.cursor()
 
-        # Modificamos la tabla customers para usar clave primaria compuesta
         create_customers_query = """
-        CREATE TABLE IF NOT EXISTS customers (
-            id_persona VARCHAR(255) NOT NULL,
-            id_autonomo VARCHAR(255) NOT NULL,
-            nombre VARCHAR(255) NOT NULL,
-            telefono VARCHAR(255) NOT NULL,
-            fecha_reserva DATE NOT NULL,
-            hora_reserva TIME NOT NULL,
-            status VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP NOT NULL,
-            PRIMARY KEY (id_persona, id_autonomo, fecha_reserva, hora_reserva)
-        );
+    CREATE TABLE IF NOT EXISTS customers (
+    id_persona VARCHAR(255) NOT NULL,
+    id_autonomo VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255) NOT NULL,
+    fecha_reserva DATE NOT NULL,
+    hora_reserva TIME NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (id_persona)
+    );
         """
         cursor.execute(create_customers_query)
 
         create_clients_query = """
-        CREATE TABLE IF NOT EXISTS clients (
-            id_persona VARCHAR(255) NOT NULL,
-            nombre VARCHAR(255) NOT NULL,
-            telefono VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP NOT NULL,
-            PRIMARY KEY (id_persona)
-        );
+    CREATE TABLE IF NOT EXISTS clients (
+    id_persona VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (id_persona)
+    );
         """
         cursor.execute(create_clients_query)
         
@@ -170,13 +169,15 @@ def insert_postgres(data):
                 conn.close()
                 return
 
-        # Modificada para usar clave primaria compuesta
         insert_query = """
         INSERT INTO customers (id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (id_persona, id_autonomo, fecha_reserva, hora_reserva) DO UPDATE SET
+        ON CONFLICT (id_persona) DO UPDATE SET
+            id_autonomo = EXCLUDED.id_autonomo,
             nombre = EXCLUDED.nombre,
             telefono = EXCLUDED.telefono,
+            fecha_reserva = EXCLUDED.fecha_reserva,
+            hora_reserva = EXCLUDED.hora_reserva,
             status = EXCLUDED.status,
             created_at = EXCLUDED.created_at
         """
@@ -222,21 +223,6 @@ def insert_client_to_bigquery(client, data):
         # Definimos el ID de la tabla de clientes
         table_id = f"{PROJECT_ID}.{BQ_DATASET}.clients"
         
-        # Verificamos si el cliente ya existe en BigQuery
-        query = f"""
-        SELECT COUNT(*) as count
-        FROM `{PROJECT_ID}.{BQ_DATASET}.clients`
-        WHERE id_persona = '{data["id_persona"]}'
-        """
-        
-        query_job = client.query(query)
-        results = list(query_job)
-        
-        # Si el cliente ya existe, no lo insertamos de nuevo
-        if results and results[0]['count'] > 0:
-            logging.info(f"Cliente ya existe en BigQuery, no se insertará nuevamente: {data['id_persona']}")
-            return
-        
         # Preparamos los datos para insertar
         rows_to_insert = [{
             "id_persona": data["id_persona"],
@@ -266,11 +252,6 @@ def insert_reservation_to_bigquery(client, data):
         # Definimos el ID de la tabla de reservas
         table_id = f"{PROJECT_ID}.{BQ_DATASET}.reservas"
         
-        # Formatear la hora correctamente para BigQuery (añadir segundos si no están presentes)
-        hora_reserva = data["hora_reserva"]
-        if ":" in hora_reserva and len(hora_reserva.split(":")) == 2:
-            hora_reserva = f"{hora_reserva}:00"  # Añade los segundos si solo tiene HH:MM
-        
         # Preparamos los datos para insertar - SIEMPRE insertamos TODOS los registros para análisis
         rows_to_insert = [{
             "id_persona": data["id_persona"],
@@ -278,7 +259,7 @@ def insert_reservation_to_bigquery(client, data):
             "nombre": data["nombre"],
             "telefono": data["telefono"],
             "fecha_reserva": data["fecha_reserva"],
-            "hora_reserva": hora_reserva,  # Usamos la hora formateada
+            "hora_reserva": data["hora_reserva"],
             "status": data["status"],
             "created_at": data["created_at"]
         }]
@@ -286,7 +267,7 @@ def insert_reservation_to_bigquery(client, data):
         # Insertamos los datos
         errors = client.insert_rows_json(table_id, rows_to_insert)
         if errors == []:
-            logging.info(f"Reserva insertada en BigQuery: {data['id_persona']} - {data['fecha_reserva']} {hora_reserva} - Status: {data['status']}")
+            logging.info(f"Reserva insertada en BigQuery: {data['id_persona']} - {data['fecha_reserva']} {data['hora_reserva']} - Status: {data['status']}")
         else:
             logging.error(f"Errores al insertar en BigQuery (reservas): {errors}")
     except Exception as e:

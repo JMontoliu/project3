@@ -1,0 +1,6 @@
+[
+  { "name": "id_persona", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "nombre", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "telefono", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

@@ -1,2 +1,3 @@
-functions-framework==3.5.0
-psycopg2-binary==2.9.9
+functions-framework==3.*
+psycopg2-binary==2.*
+google-cloud-bigquery==3.*
