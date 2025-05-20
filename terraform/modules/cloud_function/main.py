@@ -45,6 +45,8 @@ def create_tables_if_not_exist(conn):
             fecha_reserva DATE NOT NULL,
             hora_reserva TIME NOT NULL,
             status VARCHAR(255) NOT NULL,
+            producto VARCHAR(255) NOT NULL,
+            precio INT64 NOT NULL,
             created_at TIMESTAMP NOT NULL,
             PRIMARY KEY (id_ticket),
             UNIQUE (id_persona, id_autonomo, fecha_reserva, hora_reserva)
@@ -172,11 +174,13 @@ def insert_postgres(data):
         
         insert_query = """
         INSERT INTO customers (id_ticket, id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (id_persona, id_autonomo, fecha_reserva, hora_reserva) DO UPDATE SET
             nombre = EXCLUDED.nombre,
             telefono = EXCLUDED.telefono,
             status = EXCLUDED.status,
+            producto = EXCLUDED.producto,
+            precio = EXCLUDED.precio,
             created_at = EXCLUDED.created_at
         """
 
@@ -189,6 +193,8 @@ def insert_postgres(data):
             data["fecha_reserva"],
             data["hora_reserva"],
             data["status"],
+            data["producto"],
+            data["precio"],
             data["created_at"]
         ))
 
@@ -251,7 +257,7 @@ def insert_client_to_bigquery(client, data):
 def insert_reservation_to_bigquery(client, data):
     try:
         required_fields = ["id_persona", "id_autonomo", "nombre", "telefono", 
-                           "fecha_reserva", "hora_reserva", "status", "created_at"]
+                           "fecha_reserva", "hora_reserva", "status", "producto", "precio", "created_at"]
         if not all(field in data for field in required_fields):
             logging.error("Faltan campos requeridos para insertar en la tabla de reservas")
             return
@@ -301,6 +307,8 @@ def insert_reservation_to_bigquery(client, data):
             "fecha_reserva": data["fecha_reserva"],
             "hora_reserva": hora_reserva,
             "status": data["status"],
+            "producto": data["producto"],
+            "precio": data["precio"],
             "created_at": data["created_at"]
         }
         
