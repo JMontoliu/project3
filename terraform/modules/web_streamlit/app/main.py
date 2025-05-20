@@ -3,7 +3,7 @@ import requests
 import os
 
 # URL de tu API
-url = os.getenv("URL_CHATBOT2", "").rstrip("/")
+url = os.getenv("URL_CHATBOT2").rstrip("/")
 if not url:
     print("Error: URL_CHATBOT2 no está configurada.")
 if not url.endswith("/chat"):

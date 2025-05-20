@@ -10,7 +10,7 @@ load_dotenv() # Carga .env desde la raíz del proyecto si ejecutas localmente,
               # Para docker-compose, las variables de .env ya están inyectadas.
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_API_KEY")
-url = os.getenv("URL_CHATBOT", "").rstrip("/")
+url = os.getenv("URL_CHATBOT").rstrip("/")
 if not url:
     print("Error: URL_CHATBOT no está configurada.")
 if not url.endswith("/chat"):
