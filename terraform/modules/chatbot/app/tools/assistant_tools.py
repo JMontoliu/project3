@@ -33,19 +33,16 @@ def registrar_cita(
     fecha_reserva: str,
     hora_reserva: str
 ) -> str:
-    """
+    """ 
     Registra una NUEVA cita en el sistema para un cliente. Esta acción guarda la reserva.
     Se DEBEN proporcionar TODOS los siguientes datos como argumentos:
     - nombre (str): Nombre completo del cliente.
     - telefono (str): Número de teléfono de contacto del cliente.
+    - Producto (str): El nombre del producto o servicio que se va a reservar (ej. 'Pack Newborn', 'Pack Embarazo', 'Pack New Born').
+    - Precio (int): El precio del producto o servicio que se va a reservar (ej. 150, 200, 250). Se obtiene con la información de los productos.
     - fecha_reserva (str): Fecha deseada para la cita en formato YYYY-MM-DD.
     - hora_reserva (str): Hora deseada para la cita en formato HH:MM (24h).
-    - Producto (str): El nombre del producto o servicio que se va a reservar (ej. 'Pack Newborn', 'Pack Embarazo', 'Pack New Born').
-    - Precio (int): El precio del producto o servicio que se va a reservar (ej. 150, 200, 250).
-    - tipo_sesion (str): El tipo específico de sesión fotográfica que se va a reservar (ej. 'Sesión Newborn Clásica', 'Sesión Embarazo Exterior', 'Pack Dulce Espera').
-    Devuelve un mensaje de confirmación con un ID de cita si tiene éxito, o un mensaje de error si el registro falla.
     """
-
     hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
     
     url = os.getenv("CUSTOMER_API_URL").rstrip("/")
