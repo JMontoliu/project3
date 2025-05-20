@@ -28,6 +28,8 @@ def get_current_datetime_in_spain() -> str:
 def registrar_cita(
     nombre: str,
     telefono: str,
+    Producto: str,
+    Precio: int,
     fecha_reserva: str,
     hora_reserva: str
 ) -> str:
@@ -38,10 +40,13 @@ def registrar_cita(
     - telefono (str): Número de teléfono de contacto del cliente.
     - fecha_reserva (str): Fecha deseada para la cita en formato YYYY-MM-DD.
     - hora_reserva (str): Hora deseada para la cita en formato HH:MM (24h).
+    - Producto (str): El nombre del producto o servicio que se va a reservar (ej. 'Pack Newborn', 'Pack Embarazo', 'Pack New Born').
+    - Precio (int): El precio del producto o servicio que se va a reservar (ej. 150, 200, 250).
     - tipo_sesion (str): El tipo específico de sesión fotográfica que se va a reservar (ej. 'Sesión Newborn Clásica', 'Sesión Embarazo Exterior', 'Pack Dulce Espera').
     Devuelve un mensaje de confirmación con un ID de cita si tiene éxito, o un mensaje de error si el registro falla.
     """
-    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
+    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
     if not url:
         return "Error: CUSTOMER_API_URL no está configurada."
     if not url.endswith("/publish"):
@@ -53,7 +58,7 @@ def registrar_cita(
         "nombre": nombre,
         "telefono": telefono,
         "fecha_reserva": fecha_reserva,
-        "hora_reserva": hora_reserva,
+        "hora_reserva": hora_reserva_api,
         "status": "registrado",
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -91,9 +96,11 @@ def modificar_reserva(
     if not url.endswith("/publish"):
         url += "/publish"
 
+    nueva_hora_api = f"{nueva_hora}:00" if len(nueva_hora) == 5 else nueva_hora
+    
     data_cancel = {
         "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
-        "id_autonomo": "fotos",
+        "id_autonomo": "sara1234",
         "nombre": nombre,
         "telefono": telefono,
         "fecha_reserva": None,
@@ -104,11 +111,11 @@ def modificar_reserva(
 
     new_data = {
         "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
-        "id_autonomo": "fotos",
+        "id_autonomo": "sara1234",
         "nombre": nombre,
         "telefono": telefono,
         "fecha_reserva": nueva_fecha,
-        "hora_reserva": nueva_hora,
+        "hora_reserva": nueva_hora_api,
         "status": "registrado",
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -141,7 +148,8 @@ def cancelar_reserva(
     - telefono (str): Número de teléfono del cliente de la cita a cancelar.
     Devuelve un mensaje de confirmación de la cancelación o un error si no se pudo cancelar.
     """
-    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    
+    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
     if not url:
         return "Error: CUSTOMER_API_URL no está configurada."
     if not url.endswith("/publish"):
@@ -149,7 +157,7 @@ def cancelar_reserva(
 
     data = {
         "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
-        "id_autonomo": "fotos",
+        "id_autonomo": "sara1234",
         "nombre": nombre,
         "telefono": telefono,
         "fecha_reserva": None,
@@ -171,7 +179,8 @@ def cancelar_reserva(
 
 @tool
 def consultar_horarios_disponibles(
-    fecha: str
+    fecha_reserva: str,
+    hora_reserva: str
 ) -> str:
     """
     Consulta y devuelve los horarios de citas que están libres para una fecha específica.
@@ -179,27 +188,69 @@ def consultar_horarios_disponibles(
     Argumentos requeridos:
     - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
     Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
+    - hora_reserva (str): La hora para la cual se quiere consultar la disponibilidad, en formato HH:MM.
     """
-    if "hoy" in fecha.lower() or datetime.now().strftime("%Y-%m-%d") in fecha:
-        return "Simulación: Para hoy, disponibles a las 15:00, 16:00."
-    return f"Simulación: Para {fecha}, disponibles a las 10:00, 11:00, 14:00."
+    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
+    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
+    api_endpoint = f"{url}/customers/count"
 
+    params = {
+        "id_autonomo": 'sara1234',
+        "fecha_reserva": fecha_reserva,
+        "hora_reserva": hora_reserva_api
+    }
+    
+    response = requests.get(api_endpoint, params=params)
+    # Asumimos que la API siempre responde bien y con el formato esperado para simplificar
+    # En un caso real, response.raise_for_status() y try-except son importantes.
+    data = response.json()
+    count = data.get("count", 0) # Default a 0 si 'count' no viene
 
+    # Lógica de negocio simplificada (ej. Sarashot ID=1, capacidad=1)
+    if count >= 1:
+        return f"El horario de las {hora_reserva} del {fecha_reserva} ya está ocupado ({count} cliente(s)). No se puede reservar."
+    elif count == 0:
+        return f"El horario de las {hora_reserva} del {fecha_reserva} está libre."
+    else:
+        return f"En el horario de las {hora_reserva} del {fecha_reserva} hay {count} cliente(s) (capacidad no excedida para otros autónomos)."
 
 
 @tool
 def confirmar_reserva(
-    nombre: str,
-    telefono: str
+    fecha_reserva: str,
+    hora_reserva: str
 ) -> str:
     """
-    Consulta y devuelve los horarios de citas que están libres para una fecha específica.
-    Útil cuando un cliente pregunta '¿qué horas tienes libres el día X?' o '¿hay hueco para el YYYY-MM-DD?'.
-    Argumentos requeridos:
+    Antes de confirmar la reserva, deber haber realizado una reserva previa. La tool registrar_cita
+    Esta función se utiliza para confirmar que la reserva se ha confirmado correctamente.
     - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
     Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
+    - hora_reserva (str): La hora para la cual se quiere consultar la disponibilidad, en formato HH:MM.
     """
-    return f"Simulación: Reserva para {nombre} confirmada."
+    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
+    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
+    api_endpoint = f"{url}/customers/count"
+
+    params = {
+        "id_autonomo": 'sara1234',
+        "fecha_reserva": fecha_reserva,
+        "hora_reserva": hora_reserva_api
+    }
+    
+    response = requests.get(api_endpoint, params=params)
+    # Asumimos que la API siempre responde bien y con el formato esperado para simplificar
+    # En un caso real, response.raise_for_status() y try-except son importantes.
+    data = response.json()
+    count = data.get("count", 0) # Default a 0 si 'count' no viene
+
+    # Lógica de negocio simplificada (ej. Sarashot ID=1, capacidad=1)
+    if count == 1:
+        return f"La cita se ha registrado a las {hora_reserva} del {fecha_reserva}"
+    elif count == 0:
+        return f"No se ha registrado correctamente la cita."
+    else:
+        return f"Está reservado correctamente"
+
 
 @tool
 def get_weather_forecast_simple(location: str = "Valencia,Spain") -> str:
