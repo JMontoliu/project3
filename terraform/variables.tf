@@ -166,3 +166,26 @@ variable "telegram_api_key" {
   description = "URL de la API"
   type        = string
 }
+
+variable "user_grafana" {
+  type = string
+}
+
+variable "password_grafana" {
+  type = string
+}
+
+variable "repository_id_grafana" {
+  description = "ID del repositorio de Grafana en Artifact Registry"
+  type        = string  
+}
+
+variable "image_name_grafana" {
+  description = "ID del repositorio de Grafana en Artifact Registry"
+  type        = string  
+}
+
+variable "grafana_name" {
+  description = "ID del repositorio de Grafana en Artifact Registry"
+  type        = string  
+}
