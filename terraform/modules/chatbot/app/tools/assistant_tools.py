@@ -4,6 +4,7 @@ from datetime import datetime
 import random
 import pytz # Para zonas horarias
 import os   # Para acceder a variables de entorno
+import json # Para manejar JSON
 
 relative_path_products = "app/data/products.txt" 
 
@@ -24,12 +25,13 @@ def get_current_datetime_in_spain() -> str:
         print(f"Error en get_current_datetime_in_spain: {e}")
         return "Lo siento, no pude obtener la fecha y hora actual en este momento."
 
+
 @tool
 def registrar_cita(
     nombre: str,
     telefono: str,
-    Producto: str,
-    Precio: int,
+    producto: str, # Asegúrate que el LLM pasa esto con 'p' minúscula
+    precio: int,   # Asegúrate que el LLM pasa esto con 'P' minúscula o como lo tengas en el docstring
     fecha_reserva: str,
     hora_reserva: str
 ) -> str:
@@ -38,40 +40,119 @@ def registrar_cita(
     Se DEBEN proporcionar TODOS los siguientes datos como argumentos:
     - nombre (str): Nombre completo del cliente.
     - telefono (str): Número de teléfono de contacto del cliente.
-    - Producto (str): El nombre del producto o servicio que se va a reservar (ej. 'Pack Newborn', 'Pack Embarazo', 'Pack New Born').
-    - Precio (int): El precio del producto o servicio que se va a reservar (ej. 150, 200, 250). Se obtiene con la información de los productos.
+    - producto (str): El nombre del producto o servicio que se va a reservar (ej. 'Pack Newborn', 'Pack Embarazo', 'Pack New Born').
+    - precio (int): El precio del producto o servicio que se va a reservar (ej. 150, 200, 250). Se obtiene con la información de los productos.
     - fecha_reserva (str): Fecha deseada para la cita en formato YYYY-MM-DD.
     - hora_reserva (str): Hora deseada para la cita en formato HH:MM (24h).
     """
-    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
-    
-    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
-    if not url:
-        return "Error: CUSTOMER_API_URL no está configurada."
-    if not url.endswith("/publish"):
-        url += "/publish"
+    print("--- Tool: registrar_cita ---")
+    print(f"DEBUG: Argumentos recibidos -> Nombre: {nombre}, Teléfono: {telefono}, Producto: {producto}, Precio: {precio}, Fecha: {fecha_reserva}, Hora: {hora_reserva}")
 
-    data = {
-        "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
-        "id_autonomo": "sara1234",
+    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 and ":" in hora_reserva else hora_reserva
+    print(f"DEBUG: Hora formateada para API: {hora_reserva_api}")
+    
+    url_from_env = os.getenv("CUSTOMER_API_URL")
+    print(f"DEBUG: CUSTOMER_API_URL leída del entorno: '{url_from_env}'")
+
+    if not url_from_env:
+        error_msg = "Error Crítico: La variable de entorno CUSTOMER_API_URL no está configurada."
+        print(f"DEBUG: {error_msg}")
+        return error_msg
+        
+    url = url_from_env.rstrip("/")
+    if not url.endswith("/publish"): # Solo añadir /publish si la URL base no lo tiene
+        url += "/publish"
+    print(f"DEBUG: URL final para la API: '{url}'")
+
+    # Payload ajustado para parecerse más al de Postman
+    payload = {
+        "id_persona": str(random.randint(10000, 99999)),
+        "id_autonomo": "sara1234", # Asumiendo que este es fijo para Sarashot
         "nombre": nombre,
         "telefono": telefono,
-        "producto": Producto,
-        "precio": Precio,
+        "producto": producto, # Usar el argumento como se recibe
+        "precio": precio,     # Usar el argumento como se recibe
         "fecha_reserva": fecha_reserva,
         "hora_reserva": hora_reserva_api,
         "status": "registrado",
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "created_at": datetime.now(pytz.utc).isoformat().replace("+00:00", "Z"), # Formato ISO 8601 UTC
     }
+    print(f"DEBUG: Payload a enviar (JSON): {json.dumps(payload, indent=2)}")
 
     try:
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            return f"Cita registrada para {nombre} con éxito."
+        print(f"DEBUG: Intentando POST a {url}...")
+        response = requests.post(url, json=payload, timeout=20) # Aumentado el timeout a 20s
+        
+        print(f"DEBUG: Respuesta recibida. Status Code: {response.status_code}")
+        try:
+            # Intentar imprimir el cuerpo de la respuesta como texto, incluso si no es JSON
+            response_text = response.text
+            print(f"DEBUG: Cuerpo de la respuesta (texto): {response_text}")
+        except Exception as text_ex:
+            print(f"DEBUG: No se pudo obtener el cuerpo de la respuesta como texto: {text_ex}")
+            response_text = "[Cuerpo de respuesta no legible]"
+
+        # El API devuelve 202 Accepted en tu prueba de Postman
+        if response.status_code == 202:
+            try:
+                response_json = response.json()
+                if response_json.get("status") == "accepted":
+                    success_msg = f"Cita para {nombre} enviada y aceptada por el sistema."
+                    print(f"DEBUG: {success_msg}")
+                    return success_msg
+                else:
+                    warn_msg = f"Cita para {nombre} enviada (status 202), pero estado de respuesta API inesperado: {response_json.get('status')}"
+                    print(f"DEBUG: {warn_msg}")
+                    return warn_msg
+            except ValueError: # Si el cuerpo de la respuesta 202 no es JSON
+                info_msg = f"Cita para {nombre} enviada (status 202), pero la respuesta de la API no fue JSON. Respuesta texto: {response_text}"
+                print(f"DEBUG: {info_msg}")
+                return info_msg
+        elif response.status_code == 200: # Manejar 200 OK también como éxito
+            success_msg_200 = f"Cita registrada para {nombre} con éxito (Status 200)."
+            print(f"DEBUG: {success_msg_200}")
+            return success_msg_200
         else:
-            return f"Error al registrar cita: {response.text}"
-    except Exception as e:
-        return f"Error de conexión: {str(e)}"
+            # Intentar obtener un mensaje de error más detallado del JSON si es posible
+            error_detail = response_text # Usar el texto como fallback
+            try:
+                error_json = response.json()
+                # Para errores de validación de FastAPI/Pydantic
+                if "detail" in error_json: 
+                    if isinstance(error_json["detail"], list) and error_json["detail"]:
+                        first_error = error_json["detail"][0]
+                        error_msg_val = first_error.get("msg", "Error de validación")
+                        error_loc_val = str(first_error.get("loc", ""))
+                        error_detail = f"Validación fallida: {error_msg_val} en campo(s) {error_loc_val}."
+                    elif isinstance(error_json["detail"], str):
+                        error_detail = error_json["detail"]
+                elif isinstance(error_json, dict) and not error_detail: 
+                    error_detail = str(error_json)
+            except ValueError: # La respuesta de error no era JSON
+                pass 
+            
+            final_error_msg = f"Error al registrar cita. Status HTTP: {response.status_code}. Detalle API: {error_detail}"
+            print(f"DEBUG: {final_error_msg}")
+            return final_error_msg
+            
+    except requests.exceptions.Timeout:
+        timeout_msg = f"Error de conexión: Timeout (20s) esperando respuesta de {url}"
+        print(f"DEBUG: {timeout_msg}")
+        return timeout_msg
+    except requests.exceptions.ConnectionError:
+        conn_error_msg = f"Error de conexión: No se pudo conectar a {url}. ¿Está el servicio API corriendo y accesible desde este contenedor/entorno?"
+        print(f"DEBUG: {conn_error_msg}")
+        return conn_error_msg
+    except requests.exceptions.RequestException as req_ex: # Otros errores de la librería requests
+        req_error_msg = f"Error en la petición HTTP: {str(req_ex)}"
+        print(f"DEBUG: {req_error_msg}")
+        return req_error_msg
+    except Exception as e: # Captura cualquier otro error inesperado
+        import traceback
+        unexpected_error_msg = f"Error inesperado en la herramienta registrar_cita: {str(e)}"
+        print(f"DEBUG: {unexpected_error_msg}")
+        print(f"DEBUG: Traceback completo del error inesperado:\n{traceback.format_exc()}")
+        return unexpected_error_msg
     
 
 @tool
