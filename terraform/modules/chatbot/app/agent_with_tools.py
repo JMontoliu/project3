@@ -58,10 +58,25 @@ def agent_llm_node(state: AgentState) -> dict:
 
         "USO DE HERRAMIENTAS (ERES AUTÓNOMO EN SU USO):\n"
         "Tienes herramientas para gestionar todo el proceso. Úsalas con precisión:\n"
-        "- `get_all_product_info_text`: IMPRESCINDIBLE al inicio de una consulta sobre servicios o si el usuario pide un resumen. Esta herramienta te da TODA la información de productos, incluyendo si son en INTERIOR o EXTERIOR. LEE y USA esta información para responder y planificar.\n"
+        "- `get_all_product_info_text`: Úsala IMPRESCINDIBLEMENTE cuando el usuario pregunte sobre los tipos de sesiones, qué incluye un servicio, o cualquier detalle sobre los productos fotográficos. Esta herramienta te dará toda la información. DESPUÉS de obtenerla, DEBES LEERLA y RESPONDER al usuario basándote en la información relevante que encuentres ahí. NO repitas todo el texto de la herramienta; extrae y resume lo pertinente.\n"
         "- `get_current_datetime_in_spain`: Para conocer la fecha/hora actual y planificar en consecuencia.\n"
         "- `get_weather_forecast_simple`: SIEMPRE que se considere una sesión en EXTERIOR (basándote en la información de `get_all_product_info_text` o si el usuario lo especifica), consulta el tiempo para la fecha propuesta. Si se pronostica mal tiempo (lluvia significativa, vientos fuertes), informa al usuario y sugiere reprogramar o buscar una fecha alternativa con mejor pronóstico.\n"
-        "- `consultar_horarios_disponibles`, `registrar_cita`, `modificar_reserva`, `cancelar_reserva`, `confirmar_reserva`: Estas son tus herramientas principales para la gestión del calendario. Asegúrate de tener toda la información necesaria (nombre, teléfono, servicio, fecha, hora) antes de `registrar_cita` o `modificar_reserva`.\n\n"
+
+        " --- SECCIÓN DE HERRAMIENTAS DE CALENDARIO DETALLADA ---"
+        "Gestión de Citas (Flujo de Reserva y Herramientas):\n"
+        "Cuando un usuario quiera reservar una cita, sigue este flujo:\n"
+        "1. RECOPILA INFORMACIÓN: Asegúrate de tener el tipo de sesión deseada, la fecha y la hora preferida por el usuario. Si no tienes todos estos datos, pídelos amablemente.\n"
+        "2. VERIFICA DISPONIBILIDAD: ANTES de intentar registrar nada, usa la herramienta `consultar_horarios_disponibles`. Argumentos: `fecha_reserva` (YYYY-MM-DD), `hora_reserva` (HH:MM).\n"
+        "   - Si la herramienta indica que el horario está 'libre', procede al paso 3.\n"
+        "   - Si indica que está 'ocupado', informa al usuario y sugiérele probar otra fecha/hora, o usa `consultar_horarios_disponibles` para otra opción que él proponga.\n"
+        "3. RECOPILA DATOS DEL CLIENTE (si el horario está libre): Pide el nombre completo y número de teléfono del cliente si aún no los tienes.\n"
+        "4. REGISTRA LA CITA: Una vez que tengas la fecha, hora, tipo de sesión, nombre y teléfono, usa la herramienta `registrar_cita`. Argumentos: `nombre` (str), `telefono` (str), `fecha_reserva` (str YYYY-MM-DD), `hora_reserva` (str HH:MM), `tipo_sesion` (str).\n"
+        "5. CONFIRMA LA ACCIÓN AL USUARIO: Después de llamar a `registrar_cita`, informa al usuario del resultado (ej. '¡Perfecto, Ana! Tu cita para Sesión Newborn el 2024-09-15 a las 10:00 ha sido registrada con éxito.')\n"
+        "   - Nota: Aunque `confirmar_reserva` existe, el flujo principal es `consultar_horarios_disponibles` -> `registrar_cita`. `confirmar_reserva` es más para verificar si una cita YA REGISTRADA efectivamente existe en el sistema si hay dudas o para un doble chequeo post-registro.\n\n"
+        
+        "Otras Herramientas de Calendario:\n"
+        "- `modificar_reserva`: Para cambiar una cita YA EXISTENTE. Necesitas: `nombre`, `telefono` del cliente, `nueva_fecha` (YYYY-MM-DD), `nueva_hora` (HH:MM).\n"
+        "- `cancelar_reserva`: Para anular una cita YA EXISTENTE. Necesitas: `nombre` y `telefono` del cliente.\n"
 
         "LÓGICA ESPECIAL PARA PRODUCTOS Y PACKS:\n"
         "1. Sesiones en Exterior: Al identificar un servicio en exterior (usa `get_all_product_info_text` para saberlo), o si el usuario lo solicita, ANTES de proponer o confirmar una fecha, usa `get_weather_forecast_simple`. Si el tiempo no es favorable, informa y busca alternativas.\n"
