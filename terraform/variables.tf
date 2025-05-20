@@ -138,10 +138,6 @@ variable "postgres_tier" {
   description = "Tier para la instancia de Cloud SQL"
   default     = "db-f1-micro"
 }
-# variable "service" {
-#   type        = string
-#   description = "Nombre del servicio Cloud Run al que enviarás el POST"
-# }
 
 variable "entry_point" {
   type        = string

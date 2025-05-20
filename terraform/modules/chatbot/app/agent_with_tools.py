@@ -2,8 +2,8 @@
 import os
 from typing import TypedDict, Annotated, Sequence
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder # <--- ASEGÚRATE DE TENER ESTO
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -15,24 +15,26 @@ from .tools.assistant_tools import all_assistant_tools
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
-# --- LLM de Google ---
+# --- LLM de OpenAI ---
 try:
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-pro-latest", 
-        temperature=0.5 # Temperatura moderada
+    print("DEBUG: OPENAI_API_KEY:", os.getenv("OPENAI_API_KEY"))
+
+    llm = ChatOpenAI(
+        model="gpt-4o",
+        temperature=0.5,
+        api_key=os.getenv("OPENAI_API_KEY")
     )
 
 except Exception as e:
     print(f"CRITICAL ERROR: No se pudo inicializar LLM: {e}")
-    llm = None # Cambiado a llm base
-    # llm_with_tools = None
+    llm = None
 
 
 # --- Nodos del Grafo ---
 
 def agent_llm_node(state: AgentState) -> dict:
     """Nodo que llama al LLM principal del agente (que puede decidir usar una herramienta)."""
-    if llm is None: # Revisamos el llm base
+    if llm is None:
         return {"messages": [AIMessage(content="Error: El modelo de lenguaje no está disponible.")]}
     
     print("Agent LLM Node: Procesando...")
@@ -81,7 +83,6 @@ def agent_llm_node(state: AgentState) -> dict:
         "- Sé proactivo y ayuda al usuario a completar su objetivo de la forma más fluida posible.\n"
         "- No contestes a preguntar que no tengan que ver con el negocio de Sarashot.\n"
     )
-
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt_text),
@@ -89,12 +90,9 @@ def agent_llm_node(state: AgentState) -> dict:
     ])
     
     # Construimos la cadena: Prompt -> LLM (con herramientas vinculadas)
-    if hasattr(llm, 'bind_tools'): # Comprobación por si acaso
-        agent_chain = prompt | llm.bind_tools(all_assistant_tools) # Vincular herramientas aquí para esta cadena específica
-    else: # Fallback si algo va mal con la instancia del llm
-        print("Advertencia: LLM no tiene bind_tools, el llamado a herramientas podría no funcionar como se espera.")
-        agent_chain = prompt | llm
-
+    # OpenAI usa bind_tools de manera similar a Gemini
+    agent_chain = prompt | llm.bind_tools(all_assistant_tools)
+    
     # El LLM devolverá un AIMessage, que puede contener `tool_calls`
     # Pasamos el historial de mensajes completo al prompt
     response_ai_message = agent_chain.invoke({"messages_history": state["messages"]}) 
@@ -103,28 +101,25 @@ def agent_llm_node(state: AgentState) -> dict:
     return {"messages": [response_ai_message]}
 
 
-# Nodo preconstruido para ejecutar las herramientas (se mantiene igual)
+# Nodo preconstruido para ejecutar las herramientas
 tool_node = ToolNode(all_assistant_tools)
 
 
-# --- Construcción del Grafo (se mantiene igual) ---
+# --- Construcción del Grafo ---
 def create_agent_graph() -> StateGraph:
     builder = StateGraph(AgentState)
 
     builder.add_node("agent_llm", agent_llm_node)
-    builder.add_node("tools_executor", tool_node) # Ya tienes este nodo definido
+    builder.add_node("tools_executor", tool_node)
 
     builder.set_entry_point("agent_llm")
 
-
     builder.add_conditional_edges(
-        "agent_llm",    # Nodo de origen
-        tools_condition, # Función de LangGraph que revisa `tool_calls`
-        # `tools_condition` devuelve la clave "tools" o "__end__"
-        # Ahora proveemos el mapeo para esas claves:
+        "agent_llm",      # Nodo de origen
+        tools_condition,  # Función de LangGraph que revisa `tool_calls`
         {
-            "tools": "tools_executor", # Si tools_condition devuelve "tools", ir al nodo "tools_executor"
-            "__end__": END             # Si tools_condition devuelve "__end__", ir al nodo final END
+            "tools": "tools_executor",  # Si tools_condition devuelve "tools", ir al nodo "tools_executor"
+            "__end__": END              # Si tools_condition devuelve "__end__", ir al nodo final END
         }
     )
     
@@ -134,14 +129,14 @@ def create_agent_graph() -> StateGraph:
     builder.add_edge("tools_executor", "agent_llm") 
 
     compiled_graph = builder.compile()
-    print("Grafo de Agente con Herramientas (corregido) compilado.")
+    print("Grafo de Agente con OpenAI compilado correctamente.")
     return compiled_graph
 
 
-# Instancia del grafo (se mantiene igual)
+# Instancia del grafo
 compiled_agent_graph = create_agent_graph()
 
-# Función que la API llamará (se mantiene igual)
+# Función que la API llamará
 def invoke_agent_with_tools(user_input: str, chat_history: Sequence[BaseMessage] = None) -> str:
     current_messages_for_graph = list(chat_history or []) + [HumanMessage(content=user_input)]
     initial_state: AgentState = {"messages": current_messages_for_graph}

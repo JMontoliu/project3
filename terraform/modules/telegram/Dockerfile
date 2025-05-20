@@ -16,9 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # (Solo copiaremos la carpeta 'app' y el archivo .env si estuviera aquí)
 COPY ./app ./
 # Si .env estuviera en telegram_gateway/, lo copiarías así:
-COPY .env .
+# COPY .env .
 
-EXPOSE 8030
 # Comando para ejecutar la aplicación cuando el contenedor inicie
 # Asegúrate de que el .env se carga correctamente desde la ubicación correcta
 # o que las variables de entorno se pasan a través de docker-compose.

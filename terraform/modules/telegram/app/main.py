@@ -1,41 +1,20 @@
 # telegram/app/main.py
 import os
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests 
 from telegram import Update
 from telegram.ext import ContextTypes, Application, CommandHandler, MessageHandler, filters
 from dotenv import load_dotenv
 
-load_dotenv()  # Carga .env
+load_dotenv() # Carga .env desde la raíz del proyecto si ejecutas localmente,
+              # o desde la raíz del WORKDIR si se copia en Docker.
+              # Para docker-compose, las variables de .env ya están inyectadas.
 
-# 1. Puerto dinámico que Cloud Run inyecta
-PORT = int(os.getenv("PORT", "8030"))
-
-# 2. Servidor HTTP mínimo para health checks
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path in ("/", "/healthz"):
-            self.send_response(200)
-            self.send_header("Content-Type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"OK")
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-def start_health_server():
-    server = HTTPServer(("0.0.0.0", PORT), HealthHandler)
-    server.serve_forever()
-
-# 3. Lanza el health server en background
-threading.Thread(target=start_health_server, daemon=True).start()
-
-
-# Variables Telegram + Chatbot Core
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_API_KEY")
-_base = os.getenv("URL_CHATBOT", "").rstrip("/")
-CHATBOT_CORE_URL = f"{_base}/chat"
+url = os.getenv("URL_CHATBOT", "").rstrip("/")
+if not url:
+    print("Error: URL_CHATBOT no está configurada.")
+if not url.endswith("/chat"):
+    url += "/chat"
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
@@ -43,19 +22,32 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = str(update.effective_user.id)  # Asegúrate que es string
+    user_id = str(update.effective_user.id) # Asegúrate que es string para el JSON
     user_input = update.message.text
-    bot_response_text = "Lo siento, no pude contactar al chatbot."
+    bot_response_text = "Lo siento, no pude contactar al chatbot." # Respuesta por defecto
 
-    payload = {"thread_id": user_id, "message": user_input}
-    print(f"Enviando a Chatbot Core ({CHATBOT_CORE_URL}): {payload}")
+    payload = {
+        "thread_id": user_id,
+        "message": user_input
+    }
+
+    print(f"Telegram Gateway: Enviando a Chatbot Core: {payload}")
 
     try:
-        r = requests.post(CHATBOT_CORE_URL, json=payload, timeout=10)
-        r.raise_for_status()
-        bot_response_text = r.json().get("response", bot_response_text)
+        response = requests.post(url, json=payload, timeout=10) # timeout de 10s
+        response.raise_for_status() # Lanza una excepción para errores HTTP 4xx/5xx
+        
+        response_data = response.json()
+        bot_response_text = response_data.get("response", "No se recibió respuesta del chatbot.")
+        print(f"Telegram Gateway: Recibido de Chatbot Core: {bot_response_text}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error al conectar con Chatbot Core: {e}")
+        bot_response_text = "Hubo un problema de comunicación con el servicio de chat. Inténtalo más tarde."
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error inesperado: {e}")
+        bot_response_text = "Ocurrió un error inesperado."
+
 
     await update.message.reply_text(bot_response_text)
 
@@ -63,15 +55,12 @@ def main() -> None:
     if not TELEGRAM_TOKEN:
         print("Error: TELEGRAM_API_KEY no encontrada.")
         return
-    if not _base:
-        print("Error: URL_CHATBOT no configurada.")
-        return
 
     application = Application.builder().token(TELEGRAM_TOKEN).build()
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    print(f"Bot iniciado; health‐check en 0.0.0.0:{PORT}")
+    print("Bot de Telegram (Gateway) iniciado y listo para hablar con Chatbot Core...")
     application.run_polling()
 
 if __name__ == '__main__':

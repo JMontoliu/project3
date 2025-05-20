@@ -4,3 +4,4 @@ terraform.exe
 .venv
 venv
 env-telegram
+terraform.tfvars

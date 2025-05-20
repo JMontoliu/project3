@@ -45,7 +45,7 @@ def registrar_cita(
     if not url:
         return "Error: CUSTOMER_API_URL no está configurada."
     if not url.endswith("/publish"):
-        url = url + "/publish"
+        url += "/publish"
 
     payload = {
         "data": {
