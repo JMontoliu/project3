@@ -14,11 +14,11 @@ PROJECT_ID = os.getenv("PROJECT_ID", "dataproject03")
 REGION = os.getenv("REGION", "europe-west1")
 BQ_DATASET = os.getenv("BQ_DATASET", "chatbot_dataset")
 
-PG_DATABASE = os.getenv("PG_DATABASE", "reservas_db")
-PG_USER = os.getenv("PG_USER", "postgres_user")
-PG_PASSWORD = os.getenv("PG_PASSWORD", "password")
-PG_HOST = os.getenv("PG_HOST", "localhost")
-PG_PORT = os.getenv("PG_PORT", "5432")
+PG_DATABASE = os.getenv("PG_DATABASE")
+PG_USER = os.getenv("PG_USER")
+PG_PASSWORD = os.getenv("PG_PASSWORD")
+PG_HOST = os.getenv("PG_HOST")
+PG_PORT = os.getenv("PG_PORT")
 
 def get_postgres_connection():
     conn = psycopg2.connect(
