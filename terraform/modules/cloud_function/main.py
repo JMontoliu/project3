@@ -10,15 +10,15 @@ import uuid
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-PROJECT_ID = os.getenv("PROJECT_ID", "dataproject03")
-REGION = os.getenv("REGION", "europe-west1")
-BQ_DATASET = os.getenv("BQ_DATASET", "chatbot_dataset")
+PROJECT_ID = os.getenv("PROJECT_ID")
+REGION = os.getenv("REGION")
+BQ_DATASET = os.getenv("BQ_DATASET")
 
-PG_DATABASE = os.getenv("PG_DATABASE", "reservas_db")
-PG_USER = os.getenv("PG_USER", "postgres_user")
-PG_PASSWORD = os.getenv("PG_PASSWORD", "password")
-PG_HOST = os.getenv("PG_HOST", "localhost")
-PG_PORT = os.getenv("PG_PORT", "5432")
+PG_DATABASE = os.getenv("PG_DATABASE")
+PG_USER = os.getenv("PG_USER")
+PG_PASSWORD = os.getenv("PG_PASSWORD")
+PG_HOST = os.getenv("PG_HOST")
+PG_PORT = os.getenv("PG_PORT")
 
 def get_postgres_connection():
     conn = psycopg2.connect(
@@ -46,7 +46,7 @@ def create_tables_if_not_exist(conn):
             hora_reserva TIME NOT NULL,
             status VARCHAR(255) NOT NULL,
             producto VARCHAR(255) NOT NULL,
-            precio INT64 NOT NULL,
+            precio INTEGER NOT NULL,
             created_at TIMESTAMP NOT NULL,
             PRIMARY KEY (id_ticket),
             UNIQUE (id_persona, id_autonomo, fecha_reserva, hora_reserva)
@@ -173,7 +173,7 @@ def insert_postgres(data):
         id_ticket = str(uuid.uuid4())
         
         insert_query = """
-        INSERT INTO customers (id_ticket, id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, created_at)
+        INSERT INTO customers (id_ticket, id_persona, id_autonomo, nombre, telefono, fecha_reserva, hora_reserva, status, producto, precio, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (id_persona, id_autonomo, fecha_reserva, hora_reserva) DO UPDATE SET
             nombre = EXCLUDED.nombre,
@@ -325,15 +325,31 @@ def insert_reservation_to_bigquery(client, data):
 @functions_framework.cloud_event
 def process_pubsub_message(cloud_event):
     try:
-        data = json.loads(base64.b64decode(cloud_event.data["message"]["data"]).decode('utf-8'))
+        message_data = cloud_event.data.get("message", {}).get("data")
+        if not message_data:
+            logging.error("No se encontró data en el mensaje de Pub/Sub")
+            return
+            
+        data = json.loads(base64.b64decode(message_data).decode('utf-8'))
+        
+        required_fields = ["id_persona", "id_autonomo", "nombre", "telefono", 
+                          "fecha_reserva", "hora_reserva", "status", "producto", "precio"]
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            logging.error(f"Faltan campos obligatorios: {missing_fields}")
+            return
         
         if "created_at" not in data:
             data["created_at"] = datetime.now().isoformat()
+        
+        logging.info(f"Procesando mensaje: {data}")
         
         insert_postgres(data)
         insert_to_bigquery(data)
         
         logging.info("Procesamiento completado con éxito")
+    except json.JSONDecodeError as e:
+        logging.error(f"Error al decodificar JSON: {e}")
     except Exception as e:
         logging.error(f"Error al procesar el mensaje: {e}")
         raise
