@@ -56,9 +56,11 @@ def registrar_cita(
 
     data = {
         "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
-        "id_autonomo": "fotos",
+        "id_autonomo": "sara1234",
         "nombre": nombre,
         "telefono": telefono,
+        "producto": Producto,
+        "precio": Precio,
         "fecha_reserva": fecha_reserva,
         "hora_reserva": hora_reserva_api,
         "status": "registrado",
