@@ -12,7 +12,7 @@ if not url.endswith("/chat"):
 # Configuración de la página
 st.set_page_config(page_title="GestorBot de Sarashot", layout="centered")
 st.title("GestorBot de Sarashot 📷")
-st.title( url )
+
 # Inicializar historial de chat
 if "chat" not in st.session_state:
     st.session_state.chat = []  # cada item será un dict con {"role": "user" o "assistant", "message": ...}
