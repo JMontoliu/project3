@@ -66,14 +66,9 @@ def agent_llm_node(state: AgentState) -> dict:
         "Gestión de Citas (Flujo de Reserva y Herramientas):\n"
         "Cuando un usuario quiera reservar una cita, sigue este flujo:\n"
         "1. RECOPILA INFORMACIÓN: Asegúrate de tener el tipo de sesión deseada, la fecha y la hora preferida por el usuario. Si no tienes todos estos datos, pídelos amablemente.\n"
-        "2. VERIFICA DISPONIBILIDAD: ANTES de intentar registrar nada, usa la herramienta `consultar_horarios_disponibles`. Argumentos: `fecha_reserva` (YYYY-MM-DD), `hora_reserva` (HH:MM).\n"
-        "   - Si la herramienta indica que el horario está 'libre', procede al paso 3.\n"
-        "   - Si indica que está 'ocupado', informa al usuario y sugiérele probar otra fecha/hora, o usa `consultar_horarios_disponibles` para otra opción que él proponga.\n"
-        "3. RECOPILA DATOS DEL CLIENTE (si el horario está libre): Pide el nombre completo y número de teléfono del cliente si aún no los tienes.\n"
-        "4. REGISTRA LA CITA: Una vez que tengas la fecha, hora, tipo de sesión, nombre y teléfono, usa la herramienta `registrar_cita`. Argumentos: `nombre` (str), `telefono` (str), `fecha_reserva` (str YYYY-MM-DD), `hora_reserva` (str HH:MM), `tipo_sesion` (str).\n"
-        "5. CONFIRMA LA ACCIÓN AL USUARIO: Después de llamar a `registrar_cita`, informa al usuario del resultado (ej. '¡Perfecto, Ana! Tu cita para Sesión Newborn el 2024-09-15 a las 10:00 ha sido registrada con éxito.')\n"
-        "   - Nota: Aunque `confirmar_reserva` existe, el flujo principal es `consultar_horarios_disponibles` -> `registrar_cita`. `confirmar_reserva` es más para verificar si una cita YA REGISTRADA efectivamente existe en el sistema si hay dudas o para un doble chequeo post-registro.\n\n"
-        
+        "2. RECOPILA DATOS DEL CLIENTE (si el horario está libre): Pide el nombre completo y número de teléfono del cliente si aún no los tienes.\n"
+        "3. REGISTRA LA CITA: Una vez que tengas la fecha, hora, tipo de sesión, nombre y teléfono, usa la herramienta `registrar_cita`. Argumentos: `nombre` (str), `telefono` (str), `fecha_reserva` (str YYYY-MM-DD), `hora_reserva` (str HH:MM), `tipo_sesion` (str).\n"
+       
         "Otras Herramientas de Calendario:\n"
         "- `modificar_reserva`: Para cambiar una cita YA EXISTENTE. Necesitas: `nombre`, `telefono` del cliente, `nueva_fecha` (YYYY-MM-DD), `nueva_hora` (HH:MM).\n"
         "- `cancelar_reserva`: Para anular una cita YA EXISTENTE. Necesitas: `nombre` y `telefono` del cliente.\n"
