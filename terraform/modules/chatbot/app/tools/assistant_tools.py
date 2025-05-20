@@ -192,7 +192,6 @@ def consultar_horarios_disponibles(
     Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
     - hora_reserva (str): La hora para la cual se quiere consultar la disponibilidad, en formato HH:MM.
     """
-    '''
     hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
     url = os.getenv("CUSTOMER_API_URL").rstrip("/")
     api_endpoint = f"{url}/customers/count"
@@ -216,8 +215,7 @@ def consultar_horarios_disponibles(
         return f"El horario de las {hora_reserva} del {fecha_reserva} está libre."
     else:
         return f"En el horario de las {hora_reserva} del {fecha_reserva} hay {count} cliente(s) (capacidad no excedida para otros autónomos)."
-    ''' 
-    return f"El horario de las {hora_reserva} del {fecha_reserva} está libre. Puedes reservarlo."
+
 
 @tool
 def confirmar_reserva(
