@@ -75,7 +75,7 @@ def read_customers():
 
 @app.get("/customers/count")
 def count_customers(
-    id_autonomo: int = Query(..., description="ID del autónomo"),
+    id_autonomo: str = Query(..., description="ID del autónomo"),
     fecha_reserva: str = Query(..., description="Fecha de la reserva (YYYY-MM-DD)"),
     hora_reserva: str = Query(..., description="Hora de la reserva (HH:MM:SS)")
 ):
