@@ -37,7 +37,7 @@ if user_input:
     }
 
     try:
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(url, json=payload)
         response.raise_for_status()
         data = response.json()
         respuesta = data.get("response", "[Sin respuesta de la API]")
