@@ -1,5 +1,4 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Body
 from google.cloud import pubsub_v1
 import psycopg2
 import os
@@ -23,14 +22,14 @@ def get_conn():
         port     = os.getenv("DB_PORT")
     )
 
-# Modelo para publicación
-class PublishRequest(BaseModel):
-    data: dict
-
 @app.post("/publish")
-def publish_message(req: PublishRequest):
+def publish_message(payload: dict = Body(...)):
+    """
+    Publica directamente el JSON recibido en Pub/Sub.
+    No necesita envolver el objeto en "data".
+    """
     try:
-        msg_json = json.dumps(req.data)
+        msg_json = json.dumps(payload)
         future   = publisher.publish(topic_path, msg_json.encode("utf-8"))
         return {"message_id": future.result()}
     except Exception as e:
@@ -47,10 +46,10 @@ def read_customers():
         cur.execute("""
             SELECT id_persona, id_autonomo, nombre, telefono,
                    fecha_reserva, hora_reserva, status, created_at
-            FROM customers;
+            FROM customers
         """)
-        cols    = [d[0] for d in cur.description]
-        rows    = cur.fetchall()
+        cols = [d[0] for d in cur.description]
+        rows = cur.fetchall()
         cur.close()
         conn.close()
         return [dict(zip(cols, row)) for row in rows]
@@ -67,10 +66,10 @@ def read_clients():
         cur  = conn.cursor()
         cur.execute("""
             SELECT id_persona, nombre, telefono, created_at
-            FROM clients;
+            FROM clients
         """)
-        cols    = [d[0] for d in cur.description]
-        rows    = cur.fetchall()
+        cols = [d[0] for d in cur.description]
+        rows = cur.fetchall()
         cur.close()
         conn.close()
         return [dict(zip(cols, row)) for row in rows]
