@@ -1,10 +1,24 @@
-from fastapi import FastAPI, HTTPException, Body
-from google.cloud import pubsub_v1
-import psycopg2
-import os
+from fastapi import FastAPI, HTTPException, Body, Query
+from pydantic import BaseModel
+from datetime import date, time, datetime
 import json
+import os
+import psycopg2
+from google.cloud import pubsub_v1
+
 
 app = FastAPI()
+
+class CustomerTicket(BaseModel):
+    id_ticket: str
+    id_persona: str
+    id_autonomo: str
+    nombre: str
+    telefono: str
+    fecha_reserva: date
+    hora_reserva: time
+    status: str
+    created_at: datetime
 
 # Configuración Pub/Sub
 PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "chatbot-topic")
@@ -22,18 +36,19 @@ def get_conn():
         port     = os.getenv("DB_PORT")
     )
 
-@app.post("/publish")
-def publish_message(payload: dict = Body(...)):
+@app.post("/publish", status_code=202)
+def publish_message(payload: CustomerTicket = Body(...)):
     """
-    Publica directamente el JSON recibido en Pub/Sub.
-    No necesita envolver el objeto en "data".
+    Publica el JSON validado en Pub/Sub.
     """
     try:
-        msg_json = json.dumps(payload)
-        future   = publisher.publish(topic_path, msg_json.encode("utf-8"))
-        return {"message_id": future.result()}
+        msg_json = payload.json()
+        # Publicar sin bloquear:
+        publisher.publish(topic_path, msg_json.encode("utf-8"))
+        return {"status": "accepted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en Pub/Sub: {e}")
+
 
 @app.get("/read/customers")
 def read_customers():
@@ -56,22 +71,59 @@ def read_customers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al leer customers: {e}")
 
-@app.get("/read/clients")
-def read_clients():
+@app.get("/customers/count")
+def count_customers(
+    id_autonomo: int = Query(..., description="ID del autónomo"),
+    fecha_reserva: str = Query(..., description="Fecha de la reserva (YYYY-MM-DD)"),
+    hora_reserva: str = Query(..., description="Hora de la reserva (HH:MM:SS)")
+):
     """
-    Lee todos los registros de la tabla clients.
+    Devuelve el número de registros en customers con status 'registrado'
+    para el id_autonomo, fecha_reserva y hora_reserva proporcionados.
     """
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("""
-            SELECT id_persona, nombre, telefono, created_at
-            FROM clients
-        """)
-        cols = [d[0] for d in cur.description]
-        rows = cur.fetchall()
+        cur.execute(
+            """
+            SELECT COUNT(*) 
+            FROM customers 
+            WHERE id_autonomo = %s 
+              AND fecha_reserva = %s 
+              AND hora_reserva = %s 
+              AND status = 'registrado';
+            """,
+            (id_autonomo, fecha_reserva, hora_reserva)
+        )
+        count = cur.fetchone()[0]
         cur.close()
         conn.close()
-        return [dict(zip(cols, row)) for row in rows]
+        return {"count": count}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al leer clients: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al contar customers: {e}")
+
+@app.get("/customers/count/phone")
+def count_customers_by_phone(
+    telefono: str = Query(..., description="Teléfono del cliente")
+):
+    """
+    Devuelve el número de registros en customers
+    filtrados por el número de teléfono proporcionado.
+    """
+    try:
+        conn = get_conn()
+        cur  = conn.cursor()
+        cur.execute(
+            """
+            SELECT COUNT(*) 
+            FROM customers 
+            WHERE telefono = %s;
+            """,
+            (telefono,)
+        )
+        count = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        return {"count": count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al contar por teléfono: {e}")

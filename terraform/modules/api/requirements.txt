@@ -1,4 +1,5 @@
 fastapi
 uvicorn
+pydantic
 google-cloud-pubsub
 psycopg2-binary
