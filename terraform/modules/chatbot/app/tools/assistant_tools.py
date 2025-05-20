@@ -177,89 +177,10 @@ def cancelar_reserva(
     except Exception as e:
         return f"Error de conexión: {str(e)}"
 
-
-
-@tool
-def consultar_horarios_disponibles(
-    fecha_reserva: str,
-    hora_reserva: str
-) -> str:
-    """
-    Consulta y devuelve los horarios de citas que están libres para una fecha específica.
-    Útil cuando un cliente pregunta '¿qué horas tienes libres el día X?' o '¿hay hueco para el YYYY-MM-DD?'.
-    Argumentos requeridos:
-    - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
-    Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
-    - hora_reserva (str): La hora para la cual se quiere consultar la disponibilidad, en formato HH:MM.
-    """
-    '''
-    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
-    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
-    api_endpoint = f"{url}/customers/count"
-
-    params = {
-        "id_autonomo": 'sara1234',
-        "fecha_reserva": fecha_reserva,
-        "hora_reserva": hora_reserva_api
-    }
-    
-    response = requests.get(api_endpoint, params=params)
-    # Asumimos que la API siempre responde bien y con el formato esperado para simplificar
-    # En un caso real, response.raise_for_status() y try-except son importantes.
-    data = response.json()
-    count = data.get("count", 0) # Default a 0 si 'count' no viene
-
-    # Lógica de negocio simplificada (ej. Sarashot ID=1, capacidad=1)
-    if count >= 1:
-        return f"El horario de las {hora_reserva} del {fecha_reserva} ya está ocupado ({count} cliente(s)). No se puede reservar."
-    elif count == 0:
-        return f"El horario de las {hora_reserva} del {fecha_reserva} está libre."
-    else:
-        return f"En el horario de las {hora_reserva} del {fecha_reserva} hay {count} cliente(s) (capacidad no excedida para otros autónomos)."
-    ''' 
-    return f"El horario de las {hora_reserva} del {fecha_reserva} está libre. Puedes reservarlo."
-
-@tool
-def confirmar_reserva(
-    fecha_reserva: str,
-    hora_reserva: str
-) -> str:
-    """
-    Antes de confirmar la reserva, deber haber realizado una reserva previa. La tool registrar_cita
-    Esta función se utiliza para confirmar que la reserva se ha confirmado correctamente.
-    - fecha (str): La fecha para la cual se quiere consultar la disponibilidad, en formato YYYY-MM-DD.
-    Devuelve una lista de horarios disponibles para esa fecha o un mensaje indicando si no hay disponibilidad.
-    - hora_reserva (str): La hora para la cual se quiere consultar la disponibilidad, en formato HH:MM.
-    """
-    hora_reserva_api = f"{hora_reserva}:00" if len(hora_reserva) == 5 else hora_reserva 
-    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
-    api_endpoint = f"{url}/customers/count"
-
-    params = {
-        "id_autonomo": 'sara1234',
-        "fecha_reserva": fecha_reserva,
-        "hora_reserva": hora_reserva_api
-    }
-    
-    response = requests.get(api_endpoint, params=params)
-    # Asumimos que la API siempre responde bien y con el formato esperado para simplificar
-    # En un caso real, response.raise_for_status() y try-except son importantes.
-    data = response.json()
-    count = data.get("count", 0) # Default a 0 si 'count' no viene
-
-    # Lógica de negocio simplificada (ej. Sarashot ID=1, capacidad=1)
-    if count == 1:
-        return f"La cita se ha registrado a las {hora_reserva} del {fecha_reserva}"
-    elif count == 0:
-        return f"No se ha registrado correctamente la cita."
-    else:
-        return f"Está reservado correctamente"
-
-
 @tool
 def get_weather_forecast_simple(location: str = "Valencia,Spain") -> str:
     """
-tiene el pronóstico del tiempo actual y para los próximos 1-2 días para una ubicación específica.
+    Consulta el pronóstico del tiempo actual y para los próximos 1-2 días para una ubicación específica.
     Es muy útil para planificar sesiones fotográficas en exterior.
     Si el usuario no especifica una ubicación, por defecto se usará 'Valencia,Spain'.
     Argumentos:
@@ -355,8 +276,6 @@ all_assistant_tools = [
     registrar_cita, 
     modificar_reserva, 
     cancelar_reserva, 
-    consultar_horarios_disponibles, 
-    confirmar_reserva,
     get_current_datetime_in_spain,
     get_weather_forecast_simple,
     get_all_product_info_text
