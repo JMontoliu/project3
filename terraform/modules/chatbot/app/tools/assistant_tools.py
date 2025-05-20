@@ -92,7 +92,7 @@ def modificar_reserva(
     - nueva_hora (str): Nueva hora deseada para la cita en formato HH:MM (24h).
     Devuelve un mensaje de confirmación del cambio o un error si no se pudo modificar.
     """
-    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    url = os.getenv("CUSTOMER_API_URL").rstrip("/")
     if not url:
         return "Error: CUSTOMER_API_URL no está configurada."
     if not url.endswith("/publish"):
