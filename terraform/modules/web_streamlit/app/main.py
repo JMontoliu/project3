@@ -1,12 +1,17 @@
 import streamlit as st
 import requests
+import os
+
+# URL de tu API
+url = os.getenv("URL_CHATBOT", "").rstrip("/")
+if not url:
+    print("Error: URL_CHATBOT no está configurada.")
+if not url.endswith("/chat"):
+    url += "/chat"
 
 # Configuración de la página
 st.set_page_config(page_title="GestorBot de Sarashot", layout="centered")
 st.title("GestorBot de Sarashot 📷")
-
-# URL de tu API en Railway
-API_URL = "https://pruebasproject3-production.up.railway.app/chat"
 
 # Inicializar historial de chat
 if "chat" not in st.session_state:
@@ -32,7 +37,7 @@ if user_input:
     }
 
     try:
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(url, json=payload)
         response.raise_for_status()
         data = response.json()
         respuesta = data.get("response", "[Sin respuesta de la API]")
