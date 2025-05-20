@@ -56,8 +56,10 @@ resource "google_cloud_run_v2_service" "telegram" {
         container_port = 8050
       }
     }
+    scaling {
+        max_instance_count = 1
   }
-
+  }
   traffic {
     type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100

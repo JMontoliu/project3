@@ -24,12 +24,6 @@ variable "chatbot_url" {
   description = "Nombre del servicio Cloud Run para el chatbot"
 }
 
-variable "telegram" {
-  type        = string
-  description = "Nombre del servicio Cloud Run para el bot de Telegram"
-  
-}
-
 variable "streamlit" {
   type        = string
   description = "URL del servicio de Telegram"

@@ -7,15 +7,6 @@ resource "null_resource" "update-api-agent" {
     }
 }
 
-# resource "null_resource" "chatbot_url_telegram" {
-
-#   provisioner "local-exec" {
-#       command = <<EOT
-#       gcloud run services update ${var.telegram} --region=${var.region} --project=${var.project_id} --update-env-vars=URL_CHATBOT=${var.chatbot_url}
-#   EOT
-#     }
-# }
-
 resource "null_resource" "chatbot_url_streamlit" {
 
   provisioner "local-exec" {

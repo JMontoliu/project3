@@ -49,21 +49,6 @@ module "chatbot" {
   google_api_key          = var.google_api_key
   api_weather_key         = var.api_weather_key
 
-
-  depends_on = [ module.api, module.bbdd, module.cloud_function ]
-}
-
-module "telegram" {
-  source                     = "./modules/telegram"
-  project_id                 = var.project_id
-  region                     = var.region
-  repository_name3           = var.repository_name3
-  image_name3                = var.image_name3
-  cloud_run_service_name3    = var.cloud_run_service_name3
-  url_chatbot                = module.chatbot.url_chatbot
-  telegram_api_key           = var.telegram_api_key
-
-  depends_on = [ module.chatbot ]
 }
 
 module "web_streamlit" {
@@ -75,7 +60,7 @@ module "web_streamlit" {
   cloud_run_service_name4    = var.cloud_run_service_name4
   url_chatbot2                = module.chatbot.url_chatbot
 
-  depends_on = [ module.chatbot ]
+
 }
 
 
@@ -86,10 +71,9 @@ module "injectors" {
   api_url         = module.api.api_url
   chatbot         = module.chatbot.env_vars_api
   chatbot_url     = module.chatbot.url_chatbot
-  telegram        = module.telegram.telegram_name
   streamlit       = module.web_streamlit.streamlit_name
 
-  depends_on = [ module.api, module.bbdd, module.chatbot, module.telegram, module.web_streamlit ]
+  depends_on = [ module.api, module.chatbot, module.web_streamlit ]
 
 }
 
@@ -118,18 +102,5 @@ module "cloud_function" {
     # Logging
     LOG_LEVEL   = "INFO"
   }
-  depends_on = [ module.bbdd ]
-}
-
-module "grafana" {
-  source           = "./modules/grafana"
-  project_id       = var.project_id
-  region           = var.region
-  password_grafana = var.password_grafana
-  user_grafana     = var.user_grafana
-  repository_id    = var.repository_id_grafana
-  grafana_name     = var.grafana_name
-  image_name       = var.image_name_grafana
-
   depends_on = [ module.bbdd ]
 }
