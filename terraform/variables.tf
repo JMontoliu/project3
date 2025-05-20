@@ -116,6 +116,24 @@ variable "cloud_run_service_name3" {
   
 }
 
+variable "repository_name4" {
+  description = "Nombre del repositorio en Artifact Registry"
+  type        = string
+  
+}
+
+variable "image_name4" {
+  description = "Nombre de la imagen Docker"
+  type        = string
+  
+}
+
+variable "cloud_run_service_name4" {
+  description = "Nombre del servicio en Cloud Run"
+  type        = string
+  
+}
+
 variable "port" {
   description = "Puerto de conexión a la base de datos"
   type        = string
