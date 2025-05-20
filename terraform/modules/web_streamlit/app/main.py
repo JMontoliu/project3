@@ -3,16 +3,16 @@ import requests
 import os
 
 # URL de tu API
-url = os.getenv("URL_CHATBOT", "").rstrip("/")
+url = os.getenv("URL_CHATBOT2", "").rstrip("/")
 if not url:
-    print("Error: URL_CHATBOT no está configurada.")
+    print("Error: URL_CHATBOT2 no está configurada.")
 if not url.endswith("/chat"):
     url += "/chat"
 
 # Configuración de la página
 st.set_page_config(page_title="GestorBot de Sarashot", layout="centered")
 st.title("GestorBot de Sarashot 📷")
-
+st.title( url )
 # Inicializar historial de chat
 if "chat" not in st.session_state:
     st.session_state.chat = []  # cada item será un dict con {"role": "user" o "assistant", "message": ...}

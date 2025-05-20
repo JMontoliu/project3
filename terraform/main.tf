@@ -66,6 +66,17 @@ module "telegram" {
   depends_on = [ module.chatbot ]
 }
 
+module "web_streamlit" {
+  source                     = "./modules/web_streamlit"
+  project_id                 = var.project_id
+  region                     = var.region
+  repository_name4           = var.repository_name4
+  image_name4                = var.image_name4
+  cloud_run_service_name4    = var.cloud_run_service_name4
+  url_chatbot2                = module.chatbot.url_chatbot
+
+  depends_on = [ module.chatbot ]
+}
 
 
 module "injectors" {
@@ -76,8 +87,9 @@ module "injectors" {
   chatbot         = module.chatbot.env_vars_api
   chatbot_url     = module.chatbot.url_chatbot
   telegram        = module.telegram.telegram_name
+  streamlit       = module.web_streamlit.streamlit_name
 
-  depends_on = [ module.api, module.bbdd, module.chatbot, module.telegram ]
+  depends_on = [ module.api, module.bbdd, module.chatbot, module.telegram, module.web_streamlit ]
 
 }
 

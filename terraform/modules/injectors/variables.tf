@@ -29,3 +29,8 @@ variable "telegram" {
   description = "Nombre del servicio Cloud Run para el bot de Telegram"
   
 }
+
+variable "streamlit" {
+  type        = string
+  description = "URL del servicio de Telegram"
+}
