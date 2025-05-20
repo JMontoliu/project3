@@ -18,6 +18,8 @@ class CustomerTicket(BaseModel):
     fecha_reserva: date
     hora_reserva: time
     status: str
+    producto: str
+    precio: int
     created_at: datetime
 
 # Configuración Pub/Sub
