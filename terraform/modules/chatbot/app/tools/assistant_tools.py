@@ -47,20 +47,19 @@ def registrar_cita(
     if not url.endswith("/publish"):
         url += "/publish"
 
-    payload = {
-        "data": {
-            "user_id": random.randint(1, 99999),  # Número aleatorio como ID
-            "nombre": nombre,
-            "telefono": telefono,
-            "fecha_reserva": fecha_reserva,
-            "hora_reserva": hora_reserva,
-            "status": False,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
+    data = {
+        "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
+        "id_autonomo": "fotos",
+        "nombre": nombre,
+        "telefono": telefono,
+        "fecha_reserva": fecha_reserva,
+        "hora_reserva": hora_reserva,
+        "status": "registrado",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
     try:
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=data)
         if response.status_code == 200:
             return f"Cita registrada para {nombre} con éxito."
         else:
@@ -86,8 +85,46 @@ def modificar_reserva(
     - nueva_hora (str): Nueva hora deseada para la cita en formato HH:MM (24h).
     Devuelve un mensaje de confirmación del cambio o un error si no se pudo modificar.
     """
+    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    if not url:
+        return "Error: CUSTOMER_API_URL no está configurada."
+    if not url.endswith("/publish"):
+        url += "/publish"
 
-    return f"Simulación: Reserva para {nombre} modificada a {nueva_fecha} {nueva_hora}."
+    data_cancel = {
+        "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
+        "id_autonomo": "fotos",
+        "nombre": nombre,
+        "telefono": telefono,
+        "fecha_reserva": None,
+        "hora_reserva": None,
+        "status": "cancelado",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    new_data = {
+        "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
+        "id_autonomo": "fotos",
+        "nombre": nombre,
+        "telefono": telefono,
+        "fecha_reserva": nueva_fecha,
+        "hora_reserva": nueva_hora,
+        "status": "registrado",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    try:
+        cancel_response = requests.post(url, json=data_cancel)
+        if cancel_response.status_code != 200:
+            return f"Error al cancelar cita: {cancel_response.text}"
+
+        new_response = requests.post(url, json=new_data)
+        if new_response.status_code == 200:
+            return f"Nueva cita registrada para {nombre} con éxito."
+        else:
+            return f"Error al registrar nueva cita: {new_response.text}"
+    except Exception as e:
+        return f"Error de conexión: {str(e)}"
 
 
 
@@ -104,7 +141,31 @@ def cancelar_reserva(
     - telefono (str): Número de teléfono del cliente de la cita a cancelar.
     Devuelve un mensaje de confirmación de la cancelación o un error si no se pudo cancelar.
     """
-    return f"Simulación: Reserva para {nombre} cancelada."
+    url = os.getenv("CUSTOMER_API_URL", "").rstrip("/")
+    if not url:
+        return "Error: CUSTOMER_API_URL no está configurada."
+    if not url.endswith("/publish"):
+        url += "/publish"
+
+    data = {
+        "id_persona": random.randint(1, 99999),  # Número aleatorio como ID
+        "id_autonomo": "fotos",
+        "nombre": nombre,
+        "telefono": telefono,
+        "fecha_reserva": None,
+        "hora_reserva": None,
+        "status": "cancelado",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    try:
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            return f"Cita cancelada para {nombre} con éxito."
+        else:
+            return f"Error al cancelar cita: {response.text}"
+    except Exception as e:
+        return f"Error de conexión: {str(e)}"
 
 
 
