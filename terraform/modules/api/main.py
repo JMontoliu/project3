@@ -10,7 +10,6 @@ from google.cloud import pubsub_v1
 app = FastAPI()
 
 class CustomerTicket(BaseModel):
-    id_ticket: str
     id_persona: str
     id_autonomo: str
     nombre: str
